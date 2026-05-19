@@ -4,6 +4,8 @@ import 'mpin_state.dart';
 
 class MpinBloc extends Bloc<MpinEvent, MpinState> {
   MpinBloc() : super(MpinInitial()) {
+    
+    // --- 1. YOUR EXISTING CREATE MPIN HANDLER ---
     on<SetMpinSubmitted>((event, emit) async {
       if (event.mpin.length < 4 || event.confirmMpin.length < 4) {
         emit(MpinMismatch("Please complete both 4-digit fields"));
@@ -15,12 +17,25 @@ class MpinBloc extends Bloc<MpinEvent, MpinState> {
         return;
       }
 
+      emit(MpinLoading()); //
+      await Future.delayed(const Duration(seconds: 2)); //
+      emit(MpinSuccess()); //
+    });
+
+    // --- 2. EXISTING USER LOGIN HANDLER ---
+    on<LoginMpinSubmitted>((event, emit) async {
       emit(MpinLoading());
 
-      // Simulate backend API payload transmission to save the MPIN
-      await Future.delayed(const Duration(seconds: 2));
+      // Simulated latency delay
+      await Future.delayed(const Duration(milliseconds: 600));
 
-      emit(MpinSuccess());
+      const String defaultMpin = "1234";
+
+      if (event.pin == defaultMpin) {
+        emit(LoginMpinSuccess()); //
+      } else {
+        emit(LoginMpinFailure("Incorrect MPIN. Please try again.")); //
+      }
     });
   }
 }

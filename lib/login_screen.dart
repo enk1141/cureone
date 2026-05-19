@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/bloc/login_bloc.dart';
+import 'package:my_cure_ui/bloc/mpin_bloc.dart';
+import 'package:my_cure_ui/enter_mpin_screen.dart';
 import 'package:my_cure_ui/otpscreen.dart';
+import 'package:flutter/services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -53,22 +56,36 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
-            if (state is LoginOtpSent) { //
-              Navigator.push( //
-                context, //
-                MaterialPageRoute( //
-                  builder: (context) => OtpScreen(mobileNumber: _phoneController.text.trim()), //
-                ), //
-              ); //
+            if (state is LoginOtpSent) {
+              // NEW/UNREGISTERED USER: Route to OTP Verification Screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      OtpScreen(mobileNumber: _phoneController.text.trim()),
+                ),
+              );
+            } else if (state is LoginExistingUserSuccess) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider<MpinBloc>(
+                    create: (context) =>
+                        MpinBloc(), // Instantiates a fresh Bloc for this screen
+                    child: EnterMpinLoginScreen(
+                        mobileNumber: _phoneController.text.trim()),
+                  ),
+                ),
+              );
             }
-            
-            if (state is LoginFailure) { //
-              ScaffoldMessenger.of(context).showSnackBar( //
-                SnackBar( //
-                  content: Text(state.error), //
-                  backgroundColor: Colors.redAccent, //
-                ), //
-              ); //
+
+            if (state is LoginFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: Colors.redAccent,
+                ),
+              );
             }
           },
           builder: (context, state) {
@@ -154,7 +171,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           // Field Title & Secure Badge
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween, //
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween, //
                             children: [
                               const Text(
                                 "Mobile Number", //
@@ -202,7 +220,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: BoxDecoration(
                               border: Border.all(
                                 // Changes border color to red if an validation error exists
-                                color: _validationError != null ? Colors.redAccent : accentTeal, 
+                                color: _validationError != null
+                                    ? Colors.redAccent
+                                    : accentTeal,
                                 width: 1.5, //
                               ),
                               borderRadius: BorderRadius.circular(16), //
@@ -212,7 +232,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 // Country Code
                                 Container(
                                   margin: const EdgeInsets.all(6), //
-                                  padding: const EdgeInsets.symmetric(horizontal: 12), //
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12), //
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFF2F7F8), //
                                     borderRadius: BorderRadius.circular(12), //
@@ -235,13 +256,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ],
                                   ),
                                 ),
-                                
+
+                                // Input Field
                                 // Input Field
                                 Expanded(
                                   child: TextField(
                                     controller: _phoneController, //
                                     keyboardType: TextInputType.phone, //
                                     maxLength: 10, //
+
+                                    // --- ADD THIS LINE TO BLOCK SPACES AND ONLY ALLOW DIGITS ---
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+
                                     style: const TextStyle(
                                       fontSize: 16, //
                                       fontWeight: FontWeight.w600, //
@@ -251,7 +279,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     decoration: InputDecoration(
                                       counterText: '', //
                                       border: InputBorder.none, //
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 4), //
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 4), //
                                       hintText: "Enter mobile number", //
                                       hintStyle: TextStyle(
                                         color: Colors.grey.shade400, //
@@ -260,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ),
                                     onChanged: (value) {
-                                      _validateInput(value);
+                                      _validateInput(value); //
                                       context.read<LoginBloc>().add(
                                             MobileNumberChanged(value), //
                                           );
@@ -270,8 +300,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               ],
                             ),
                           ),
-                          
-                          // Dynamic Alert Popup underneath the text input container
                           if (_validationError != null) ...[
                             const SizedBox(height: 6),
                             Padding(
@@ -301,12 +329,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                 elevation: 0, //
                               ),
                               // Button becomes disabled if there's an active validation format failure
-                              onPressed: state is LoginLoading || _validationError != null 
-                                  ? null 
+                              onPressed: state is LoginLoading ||
+                                      _validationError != null
+                                  ? null
                                   : () {
-                                      if (_phoneController.text.trim().length == 10) { //
+                                      if (_phoneController.text.trim().length ==
+                                          10) {
+                                        //
                                         context.read<LoginBloc>().add(
-                                              LoginSubmitted( //
+                                              LoginSubmitted(
+                                                //
                                                 _phoneController.text.trim(), //
                                               ),
                                             );
@@ -322,9 +354,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     )
                                   : const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center, //
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center, //
                                       children: [
-                                        Icon(Icons.arrow_forward, color: Colors.white, size: 20), //
+                                        Icon(Icons.arrow_forward,
+                                            color: Colors.white, size: 20), //
                                         SizedBox(width: 8), //
                                         Text(
                                           "Login", //
@@ -377,7 +411,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             size: 18, //
                           ),
                           SizedBox(width: 8), //
-                          Flexible( //
+                          Flexible(
+                            //
                             child: Text(
                               "Secure • Encrypted • Official CURE ONE App", //
                               style: TextStyle(

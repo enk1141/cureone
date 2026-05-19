@@ -148,49 +148,70 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                         child: Column(
                           children: [
-                            // 6 Custom Input Boxes
+                            // NEW UPDATED CODE:
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: List.generate(6, (index) {
                                 return SizedBox(
                                   height: 52,
                                   width: 44,
-                                  child: TextField(
-                                    controller: _controllers[index],
-                                    focusNode: _focusNodes[index],
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    maxLength: 1,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: darkText,
-                                    ),
-                                    decoration: InputDecoration(
-                                      counterText: '',
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(
-                                            color: Colors.grey.shade300,
-                                            width: 1.5),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                            color: accentTeal, width: 2),
-                                      ),
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    onChanged: (value) {
-                                      if (value.isNotEmpty && index < 5) {
-                                        _focusNodes[index + 1].requestFocus();
-                                      } else if (value.isEmpty && index > 0) {
-                                        _focusNodes[index - 1].requestFocus();
+                                  child: KeyboardListener(
+                                    focusNode:
+                                        FocusNode(), // Intercepts key strokes specifically for this box item
+                                    onKeyEvent: (KeyEvent event) {
+                                      if (event is KeyDownEvent) {
+                                        // Checks if backspace key was struck on an empty text cell
+                                        if (event.logicalKey ==
+                                            LogicalKeyboardKey.backspace) {
+                                          if (_controllers[index]
+                                                  .text
+                                                  .isEmpty &&
+                                              index > 0) {
+                                            _focusNodes[index - 1]
+                                                .requestFocus();
+                                          }
+                                        }
                                       }
                                     },
+                                    child: TextField(
+                                      controller: _controllers[index],
+                                      focusNode: _focusNodes[index],
+                                      keyboardType: TextInputType.number,
+                                      textAlign: TextAlign.center,
+                                      maxLength: 1,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: darkText,
+                                      ),
+                                      decoration: InputDecoration(
+                                        counterText: '',
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey.shade300,
+                                              width: 1.5),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                              color: accentTeal, width: 2),
+                                        ),
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                      onChanged: (value) {
+                                        if (value.isNotEmpty && index < 5) {
+                                          _focusNodes[index + 1].requestFocus();
+                                        } else if (value.isEmpty && index > 0) {
+                                          _focusNodes[index - 1].requestFocus();
+                                        }
+                                      },
+                                    ),
                                   ),
                                 );
                               }),

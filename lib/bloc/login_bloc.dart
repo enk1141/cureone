@@ -5,25 +5,25 @@ part 'login_state.dart';
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginInitial()) {
     on<LoginSubmitted>((event, emit) async {
-      final phone = event.mobileNumber;
-
-      if (phone.length != 10) {
-        emit(LoginFailure("Mobile number must be exactly 10 digits"));
-        return;
-      }
-
-      final firstDigit = int.tryParse(phone[0]);
-      if (firstDigit != null && firstDigit >= 0 && firstDigit <= 5) {
-        emit(LoginFailure("Invalid mobile number format"));
-        return;
-      }
-
       emit(LoginLoading());
 
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        // Simulated network delay (reduced from 15s to 1s for better testing response)
+        await Future.delayed(const Duration(seconds: 1));
 
-      // Emit OTP sent state
-      emit(LoginOtpSent(phone));
+        // 🟢 DYNAMIC CHECKING FOR TESTING:
+        // If you type '9999999999', it treats it as an existing user.
+        // If you type any other number, it acts as a new user and goes to OTP.
+        bool isExistingUser = (event.mobileNumber == "9999999999");
+
+        if (isExistingUser) {
+          emit(LoginExistingUserSuccess()); // Bypasses OTP flow -> Enter MPIN Screen
+        } else {
+          emit(LoginOtpSent()); // Standard registration pipeline -> OTP Screen
+        }
+      } catch (e) {
+        emit(LoginFailure("Connection failed. Please try again."));
+      }
     });
   }
 }
