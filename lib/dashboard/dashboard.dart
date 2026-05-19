@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/login_screen.dart';
 import 'dashboard_bloc.dart';
 import 'dashboard_event.dart';
 import 'dashboard_state.dart';
@@ -86,7 +85,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildHeader(context),
                   const SizedBox(height: 24),
                   _buildBannerCarousel(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
+                  _buildGreetingAndWeather(),
+                  const SizedBox(height: 16),
+                  _buildScrollingTicker(),
+                  const SizedBox(height: 20),
+                  _buildPayAllAtOnceCard(),
+                  const SizedBox(height: 20),
                   _buildAllServicesHeader(),
                   _buildServicesGrid(),
                   const SizedBox(height: 32),
@@ -138,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "MY CURE",
+                  "CURE ONE",
                   style: TextStyle(
                     color: Color(0xFF19B9B9),
                     fontSize: 20,
@@ -150,7 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   "Core Urban Region.",
                   style: TextStyle(
                     color: Color(0xFF769B9B),
-                    fontSize: 12,
+                    fontSize: 8,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -160,16 +165,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Action Buttons
           Row(
             children: [
-              _buildHeaderButton(
-                icon: Icons.logout_rounded,
-                onPressed: () {
-                  // Navigate back to Login Screen
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  );
-                },
-              ),
+              // _buildHeaderButton(
+              //   icon: Icons.logout_rounded,
+              //   onPressed: () {
+              //     // Navigate back to Login Screen
+              //     Navigator.pushReplacement(
+              //       context,
+              //       MaterialPageRoute(builder: (_) => const LoginScreen()),
+              //     );
+              //   },
+              // ),
               const SizedBox(width: 10),
               _buildHeaderButton(
                 icon: Icons.settings_outlined,
@@ -509,7 +514,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Text(
-        "All services",
+        "Utility services",
         style: TextStyle(
           color: Color(0xFF0B0B22),
           fontSize: 20,
@@ -662,6 +667,351 @@ class _DashboardScreenState extends State<DashboardScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildGreetingAndWeather() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                height: 48,
+                width: 48,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFFE2F9F9),
+                      Color(0xFFCEECEE),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFBEE7E7),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF19B9B9).withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Text(
+                    "👋",
+                    style: TextStyle(fontSize: 22),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Namaste, Citizen",
+                    style: TextStyle(
+                      color: Color(0xFF0B0B22),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    "Welcome back to CURE ONE",
+                    style: TextStyle(
+                      color: Color(0xFF769B9B),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE3F2FD).withOpacity(0.5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFBBDEFB).withOpacity(0.8),
+                width: 1,
+              ),
+            ),
+            child: const Row(
+              children: [
+                Icon(
+                  Icons.wb_sunny_rounded,
+                  color: Color(0xFFFF9F0A),
+                  size: 16,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  "35.9°C",
+                  style: TextStyle(
+                    color: Color(0xFF0D47A1),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScrollingTicker() {
+    return const ScrollingTicker();
+  }
+
+  Widget _buildPayAllAtOnceCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF19B9B9).withOpacity(0.12),
+              blurRadius: 20,
+              spreadRadius: 0,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.01),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(28),
+            onTap: () {
+              // Action
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    height: 48,
+                    width: 48,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF19B9B9).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.payments_rounded,
+                      color: Color(0xFF19B9B9),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Pay all at once",
+                          style: TextStyle(
+                            color: Color(0xFF0B0B22),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          "Settle all pending bills in a single click",
+                          style: TextStyle(
+                            color: Color(0xFF769B9B),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF19B9B9),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF19B9B9).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ScrollingTicker extends StatefulWidget {
+  const ScrollingTicker({super.key});
+
+  @override
+  State<ScrollingTicker> createState() => _ScrollingTickerState();
+}
+
+class _ScrollingTickerState extends State<ScrollingTicker> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startScrolling());
+  }
+
+  void _startScrolling() async {
+    while (mounted) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (_scrollController.hasClients) {
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final currentScroll = _scrollController.position.pixels;
+        if (currentScroll >= maxScroll) {
+          _scrollController.jumpTo(0);
+        } else {
+          _scrollController.animateTo(
+            currentScroll + 1.5,
+            duration: const Duration(milliseconds: 50),
+            curve: Curves.linear,
+          );
+        }
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 38,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE2F9F9).withOpacity(0.4),
+        border: const Border(
+          top: BorderSide(color: Color(0xFFD3EBEB), width: 1),
+          bottom: BorderSide(color: Color(0xFFD3EBEB), width: 1),
+        ),
+      ),
+      child: ListView.builder(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            alignment: Alignment.center,
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.wb_sunny_rounded,
+                  color: Color(0xFFFF9F0A),
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                const Text(
+                  "Heatwave alert in Hyderabad",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF0F5A5A),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Container(
+                  height: 4,
+                  width: 4,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF769B9B),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                const Icon(
+                  Icons.location_on_rounded,
+                  color: Color(0xFFFF453A),
+                  size: 14,
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  "Hyderabad, TS",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF0F5A5A),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Container(
+                  height: 4,
+                  width: 4,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF769B9B),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                const Icon(
+                  Icons.schedule,
+                  color: Color(0xFF0A84FF),
+                  size: 14,
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  "Live Weather Update",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF0F5A5A),
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Container(
+                  height: 6,
+                  width: 6,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFBEE7E7),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
