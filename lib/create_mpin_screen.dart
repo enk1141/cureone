@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/bloc/mpin_bloc.dart';
 import 'package:my_cure_ui/bloc/mpin_event.dart';
 import 'package:my_cure_ui/bloc/mpin_state.dart';
+import 'package:my_cure_ui/dashboard/dashboard.dart';
 
 class CreateMpinScreen extends StatefulWidget {
   const CreateMpinScreen({super.key});
@@ -14,12 +15,15 @@ class CreateMpinScreen extends StatefulWidget {
 
 class _CreateMpinScreenState extends State<CreateMpinScreen> {
   // 4 Controllers & FocusNodes for the first MPIN row
-  final List<TextEditingController> _mpinControllers = List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _mpinControllers =
+      List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _mpinFocusNodes = List.generate(4, (_) => FocusNode());
 
   // 4 Controllers & FocusNodes for the confirmation MPIN row
-  final List<TextEditingController> _confirmControllers = List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _confirmFocusNodes = List.generate(4, (_) => FocusNode());
+  final List<TextEditingController> _confirmControllers =
+      List.generate(4, (_) => TextEditingController());
+  final List<FocusNode> _confirmFocusNodes =
+      List.generate(4, (_) => FocusNode());
 
   @override
   void dispose() {
@@ -56,20 +60,38 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
           child: BlocConsumer<MpinBloc, MpinState>(
             listener: (context, state) {
               if (state is MpinMismatch) {
+                //
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.error), backgroundColor: Colors.redAccent),
-                );
+                  //
+                  SnackBar(
+                      content: Text(state.error),
+                      backgroundColor: Colors.redAccent), //
+                ); //
                 // Clear the confirm controllers on mismatch so they can retry cleanly
                 for (var controller in _confirmControllers) {
-                  controller.clear();
-                }
-                _confirmFocusNodes[0].requestFocus();
+                  //
+                  controller.clear(); //
+                } //
+                _confirmFocusNodes[0].requestFocus(); //
               } else if (state is MpinSuccess) {
+                //
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("MPIN Set Successfully!"), backgroundColor: primaryTeal),
+                  //
+                  const SnackBar(
+                    content: Text("MPIN Set Successfully!"),
+                    backgroundColor: primaryTeal,
+                  ), //
+                ); //
+
+                // --- NAVIGATE TO DASHBOARD ---
+                // This clears the navigation stack so hitting 'back' won't take them back to the MPIN setup screen.
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardScreen(),
+                  ),
+                  (route) => false, // removes all previous routes
                 );
-                // Redirect user to the home page/dashboard:
-                // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
               }
             },
             builder: (context, state) {
@@ -88,11 +110,13 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0xFFE5DFFF), width: 1),
+                          border: Border.all(
+                              color: const Color(0xFFE5DFFF), width: 1),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: Image.asset("assets/logo.png", fit: BoxFit.contain),
+                          child: Image.asset("assets/logo.png",
+                              fit: BoxFit.contain),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -110,13 +134,17 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
 
                       const Text(
                         "Create Security MPIN",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: darkText),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: darkText),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         "Set up a 4-digit MPIN for fast and secure logins",
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                        style: TextStyle(
+                            color: Colors.grey.shade600, fontSize: 14),
                       ),
                       const SizedBox(height: 28),
 
@@ -140,7 +168,10 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                             // ROW 1: Create MPIN
                             const Text(
                               "Enter 4-Digit MPIN",
-                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: darkText),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  color: darkText),
                             ),
                             const SizedBox(height: 12),
                             Row(
@@ -154,18 +185,28 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                                     focusNode: _mpinFocusNodes[index],
                                     keyboardType: TextInputType.number,
                                     textAlign: TextAlign.center,
-                                    obscureText: true, // Hide inputs for security
+                                    obscureText:
+                                        true, // Hide inputs for security
                                     maxLength: 1,
-                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkText),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: darkText),
                                     decoration: _getInputDecoration(accentTeal),
                                     onChanged: (value) {
                                       if (value.isNotEmpty && index < 3) {
-                                        _mpinFocusNodes[index + 1].requestFocus();
+                                        _mpinFocusNodes[index + 1]
+                                            .requestFocus();
                                       } else if (value.isEmpty && index > 0) {
-                                        _mpinFocusNodes[index - 1].requestFocus();
-                                      } else if (value.isNotEmpty && index == 3) {
-                                        _confirmFocusNodes[0].requestFocus(); // Jump to confirm row
+                                        _mpinFocusNodes[index - 1]
+                                            .requestFocus();
+                                      } else if (value.isNotEmpty &&
+                                          index == 3) {
+                                        _confirmFocusNodes[0]
+                                            .requestFocus(); // Jump to confirm row
                                       }
                                     },
                                   ),
@@ -177,7 +218,10 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                             // ROW 2: Re-enter MPIN
                             const Text(
                               "Confirm 4-Digit MPIN",
-                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: darkText),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  color: darkText),
                             ),
                             const SizedBox(height: 12),
                             Row(
@@ -193,14 +237,21 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                                     textAlign: TextAlign.center,
                                     obscureText: true,
                                     maxLength: 1,
-                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkText),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: darkText),
                                     decoration: _getInputDecoration(accentTeal),
                                     onChanged: (value) {
                                       if (value.isNotEmpty && index < 3) {
-                                        _confirmFocusNodes[index + 1].requestFocus();
+                                        _confirmFocusNodes[index + 1]
+                                            .requestFocus();
                                       } else if (value.isEmpty && index > 0) {
-                                        _confirmFocusNodes[index - 1].requestFocus();
+                                        _confirmFocusNodes[index - 1]
+                                            .requestFocus();
                                       }
                                     },
                                   ),
@@ -216,7 +267,8 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF24C5C5),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16)),
                                   elevation: 0,
                                 ),
                                 onPressed: state is MpinLoading
@@ -233,16 +285,23 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                                     ? const SizedBox(
                                         height: 24,
                                         width: 24,
-                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                        child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.5),
                                       )
                                     : const Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.lock_outline, color: Colors.white, size: 20),
+                                          Icon(Icons.lock_outline,
+                                              color: Colors.white, size: 20),
                                           SizedBox(width: 8),
                                           Text(
                                             "Set MPIN",
-                                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
@@ -255,7 +314,8 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
 
                       // Footer
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(30),
@@ -264,19 +324,25 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.verified_user, color: Color(0xFF1DB9A9), size: 18),
+                            Icon(Icons.verified_user,
+                                color: Color(0xFF1DB9A9), size: 18),
                             SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 "Secure • Encrypted • Official CURE ONE App",
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF3D3D4E)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                    color: Color(0xFF3D3D4E)),
                               ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Text("Version 1.0.0", style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
+                      Text("Version 1.0.0",
+                          style: TextStyle(
+                              color: Colors.grey.shade400, fontSize: 12)),
                       const SizedBox(height: 24),
                     ],
                   ),
