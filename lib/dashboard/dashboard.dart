@@ -83,23 +83,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   const SizedBox(height: 16),
                   _buildHeader(context),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
+                  _buildGreetingCard(),
+                  const SizedBox(height: 12),
                   _buildBannerCarousel(),
-                  const SizedBox(height: 20),
-                  _buildGreetingAndWeather(),
-                  const SizedBox(height: 16),
-                  _buildScrollingTicker(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   _buildPayAllAtOnceCard(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 14),
                   _buildAllServicesHeader(),
                   _buildServicesGrid(),
+                  const SizedBox(height: 60),
+                  _buildFooter(),
                   const SizedBox(height: 32),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGreetingCard() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 25),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Welcome",
+            style: TextStyle(
+              color: Color(0xFF19B9B9),
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'Inter',
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -155,7 +176,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   "Core Urban Region.",
                   style: TextStyle(
                     color: Color(0xFF769B9B),
-                    fontSize: 8,
+                    fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -165,16 +186,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Action Buttons
           Row(
             children: [
-              // _buildHeaderButton(
-              //   icon: Icons.logout_rounded,
-              //   onPressed: () {
-              //     // Navigate back to Login Screen
-              //     Navigator.pushReplacement(
-              //       context,
-              //       MaterialPageRoute(builder: (_) => const LoginScreen()),
-              //     );
-              //   },
-              // ),
               const SizedBox(width: 10),
               _buildHeaderButton(
                 icon: Icons.settings_outlined,
@@ -239,69 +250,135 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildBannerCarousel() {
     final List<Widget> banners = [
-      _buildPropertyTaxBanner(),
-      _buildWaterBillBanner(),
+      _buildBannerCard(
+        line1: "PAY ELECTRICITY BILL",
+        line2: "THE EASY WAY",
+        tagline: "Pay your Electricity Bill on MYCURE",
+        badgeHighlight: "SECURE & FAST",
+        badgeRest: "on ELECTRICITY",
+        photoAsset: "assets/electricity_photo.png",
+      ),
+      _buildBannerCard(
+        line1: "PAY WATER BILLS",
+        line2: "THE EASY WAY",
+        tagline: "Pay your HMWSSB Water Bills on MYCURE",
+        badgeHighlight: "24/7 ONLINE",
+        badgeRest: "on WATER BILLS",
+        photoAsset: "assets/water_bill_photo.png",
+      ),
+      _buildBannerCard(
+        line1: "PAY PROPERTY TAX",
+        line2: "THE EASY WAY",
+        tagline: "Pay your Property Tax on MYCURE",
+        badgeHighlight: "5% REBATE*",
+        badgeRest: "on PROPERTY TAX",
+        photoAsset: "assets/property_tax_photo.png",
+      ),
+      _buildBannerCard(
+        line1: "RENEW TRADE LICENSE",
+        line2: "THE EASY WAY",
+        tagline: "Renew your Trade License on MYCURE",
+        badgeHighlight: "FAST RENEWAL",
+        badgeRest: "on TRADE LICENSE",
+        photoAsset: "assets/trade_license_photo.png",
+      ),
+      _buildBannerCard(
+        line1: "CLEAR E-CHALLANS",
+        line2: "THE EASY WAY",
+        tagline: "Pay your Traffic Challans on MYCURE",
+        badgeHighlight: "ZERO FEES",
+        badgeRest: "on TRAFFIC CHALLANS",
+        photoAsset: "assets/echallan_photo.png",
+      ),
+      _buildBannerCard(
+        line1: "PAY BROADBAND BILL",
+        line2: "THE EASY WAY",
+        tagline: "Pay your Broadband Bill on MYCURE",
+        badgeHighlight: "QUICK PAY",
+        badgeRest: "on BROADBAND",
+        photoAsset: "assets/broadband_photo.png",
+      ),
     ];
 
-    return Column(
-      children: [
-        CarouselSlider(
-          items: banners,
-          options: CarouselOptions(
-            height: 160,
-            viewportFraction: 0.92,
-            initialPage: 0,
-            enableInfiniteScroll: true,
-            reverse: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 5),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            autoPlayCurve: Curves.fastOutSlowIn,
-            enlargeCenterPage: false,
-            onPageChanged: (index, reason) {
-              setState(() {
-                _currentBannerIndex = index;
-              });
-            },
+    return SizedBox(
+      width: double.infinity,
+      child: Stack(
+        children: [
+          CarouselSlider(
+            items: banners.map((banner) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8, left: 8),
+                child: banner,
+              );
+            }).toList(),
+            options: CarouselOptions(
+              height: 140,
+              viewportFraction: 0.92,
+              initialPage: 0,
+              enableInfiniteScroll: true,
+              reverse: false,
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 4),
+              autoPlayAnimationDuration: const Duration(milliseconds: 800),
+              autoPlayCurve: Curves.fastOutSlowIn,
+              enlargeCenterPage: false,
+              onPageChanged: (index, reason) {
+                setState(() {
+                  _currentBannerIndex = index;
+                });
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        // Indicator Dots
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: banners.asMap().entries.map((entry) {
-            return Container(
-              width: _currentBannerIndex == entry.key ? 18.0 : 6.0,
-              height: 6.0,
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                color: _currentBannerIndex == entry.key
-                    ? const Color(0xFF19B9B9)
-                    : const Color(0xFFD0E7E7),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+          Positioned(
+            bottom: 12,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: banners.asMap().entries.map((entry) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  width: _currentBannerIndex == entry.key ? 18.0 : 6.0,
+                  height: 6.0,
+                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: _currentBannerIndex == entry.key
+                        ? const Color(0xFF0C4DA2)
+                        : const Color(0xFF0C4DA2).withOpacity(0.3),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildPropertyTaxBanner() {
+  Widget _buildBannerCard({
+    required String line1,
+    required String line2,
+    required String tagline,
+    required String badgeHighlight,
+    required String badgeRest,
+    required String photoAsset,
+  }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      margin: EdgeInsets.zero,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
           colors: [
-            Color(0xFFE6F5F6),
-            Color(0xFFCEECEE),
+            Color(0xFFEBF3FC),
+            Color(0xFFF5F9FD),
+            Color(0xFFFFFFFF),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFFBBE5E5),
+          color: const Color(0xFFEBF3FC),
           width: 1,
         ),
       ),
@@ -309,199 +386,118 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         child: Stack(
           children: [
-            // Right Side Image Background
             Positioned(
               right: 0,
               top: 0,
               bottom: 0,
-              width: 140,
-              child: Opacity(
-                opacity: 0.95,
-                child: Image.asset(
-                  "assets/property_tax_banner.png",
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            // Gradient Overlay to blend text
-            Positioned.fill(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xFFE6F5F6),
-                      Color(0xFFE6F5F6),
-                      Color(0xDFE6F5F6),
-                      Colors.transparent,
-                    ],
-                    stops: [0.0, 0.4, 0.6, 1.0],
-                  ),
-                ),
-              ),
-            ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              width: 175,
+              child: Stack(
                 children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "PAY PROPERTY TAX\nTHE EASY WAY",
-                        style: TextStyle(
-                          color: Color(0xFF0F5A5A),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          height: 1.2,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "Pay your Property Tax on MY CURE\nQuick • simple • secure.",
-                        style: TextStyle(
-                          color: Color(0xFF3F7F7F),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
+                  Positioned.fill(
+                    child: Image.asset(
+                      photoAsset,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F5A5A),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Text(
-                      "5% REBATE* ON PROPERTY TAX",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                  Positioned.fill(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
+                          colors: [
+                            Color(0x00FFFFFF),
+                            Color(0x80FFFFFF),
+                            Color(0xFFFFFFFF),
+                          ],
+                          stops: [0.0, 0.5, 0.95],
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWaterBillBanner() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFE3F2FD),
-            Color(0xFFBBDEFB),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFF90CAF9),
-          width: 1,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          children: [
-            // Right Side Image Background
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 140,
-              child: Image.asset(
-                "assets/water_bill_banner.png",
-                fit: BoxFit.cover,
-              ),
-            ),
-            // Gradient Overlay to blend text
             Positioned.fill(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xFFE3F2FD),
-                      Color(0xFFE3F2FD),
-                      Color(0xDFE3F2FD),
-                      Colors.transparent,
-                    ],
-                    stops: [0.0, 0.4, 0.6, 1.0],
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 120, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          line1,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF0F2E5C),
+                            height: 1.15,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
+                        Text(
+                          line2,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF0F2E5C),
+                            height: 1.15,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          tagline,
+                          style: const TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF3BA14E),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          "Quick > simple > secure.",
+                          style: TextStyle(
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF777777),
+                          ),
+                        ),
+                      ],
+                    ),
+                    CustomPaint(
+                      painter: RibbonPainter(),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              badgeHighlight,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              badgeRest,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 7,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "PAY WATER BILLS\nINSTANTLY",
-                        style: TextStyle(
-                          color: Color(0xFF0D47A1),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          height: 1.2,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "Settle your HMWSSB water bills in seconds.\nSafe • fast • hassle-free.",
-                        style: TextStyle(
-                          color: Color(0xFF1565C0),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0D47A1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Text(
-                      "NO LATE FEES* ON FIRST PAY",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
@@ -512,12 +508,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildAllServicesHeader() {
     return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 6),
       child: Text(
-        "Utility services",
+        "Utility Services",
         style: TextStyle(
           color: Color(0xFF0B0B22),
-          fontSize: 20,
+          fontSize: 16,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -541,12 +537,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: const EdgeInsets.only(left: 22, right: 22, top: 2, bottom: 8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 18,
             mainAxisSpacing: 18,
-            childAspectRatio: 0.95,
+            childAspectRatio: 1.05,
           ),
           itemCount: state.bills.length,
           itemBuilder: (context, index) {
@@ -562,13 +558,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
                     color: shadowColor,
-                    blurRadius: 20,
+                    blurRadius: 16,
                     spreadRadius: 0,
-                    offset: const Offset(0, 10),
+                    offset: const Offset(0, 8),
                   ),
                   BoxShadow(
                     color: Colors.black.withOpacity(0.01),
@@ -580,45 +576,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(24),
                   onTap: () {
                     // Navigate or perform action
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Icon circle
-                        Container(
-                          height: 42,
-                          width: 42,
-                          decoration: BoxDecoration(
-                            color: accentColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: accentColor.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Icon circle
+                            Container(
+                              height: 28,
+                              width: 28,
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: accentColor.withOpacity(0.3),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Icon(
-                            iconData,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                        // Service Title
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            color: Color(0xFF0B0B22),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                          ),
+                              child: Icon(
+                                iconData,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            // Service Title
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                color: Color(0xFF0B0B22),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
                         ),
                         // Bottom row: "Open ->" and mini arrow button
                         Row(
@@ -631,7 +633,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   "Open",
                                   style: TextStyle(
                                     color: accentColor,
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -639,13 +641,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Icon(
                                   Icons.arrow_forward,
                                   color: accentColor,
-                                  size: 13,
+                                  size: 12,
                                 ),
                               ],
                             ),
                             Container(
-                              height: 28,
-                              width: 28,
+                              height: 24,
+                              width: 24,
                               decoration: BoxDecoration(
                                 color: accentColor.withOpacity(0.1),
                                 shape: BoxShape.circle,
@@ -653,7 +655,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: Icon(
                                 Icons.chevron_right_rounded,
                                 color: accentColor,
-                                size: 16,
+                                size: 14,
                               ),
                             ),
                           ],
@@ -670,116 +672,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildGreetingAndWeather() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                height: 48,
-                width: 48,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFFE2F9F9),
-                      Color(0xFFCEECEE),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: const Color(0xFFBEE7E7),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF19B9B9).withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: Text(
-                    "👋",
-                    style: TextStyle(fontSize: 22),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Namaste, Citizen",
-                    style: TextStyle(
-                      color: Color(0xFF0B0B22),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    "Welcome back to CURE ONE",
-                    style: TextStyle(
-                      color: Color(0xFF769B9B),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE3F2FD).withOpacity(0.5),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: const Color(0xFFBBDEFB).withOpacity(0.8),
-                width: 1,
-              ),
-            ),
-            child: const Row(
-              children: [
-                Icon(
-                  Icons.wb_sunny_rounded,
-                  color: Color(0xFFFF9F0A),
-                  size: 16,
-                ),
-                SizedBox(width: 6),
-                Text(
-                  "35.9°C",
-                  style: TextStyle(
-                    color: Color(0xFF0D47A1),
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScrollingTicker() {
-    return const ScrollingTicker();
-  }
-
   Widget _buildPayAllAtOnceCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF19B9B9).withOpacity(0.12),
@@ -797,7 +696,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(24),
             onTap: () {
               // Action
             },
@@ -806,8 +705,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Row(
                 children: [
                   Container(
-                    height: 48,
-                    width: 48,
+                    height: 46,
+                    width: 46,
                     decoration: BoxDecoration(
                       color: const Color(0xFF19B9B9).withOpacity(0.1),
                       shape: BoxShape.circle,
@@ -815,10 +714,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: const Icon(
                       Icons.payments_rounded,
                       color: Color(0xFF19B9B9),
-                      size: 24,
+                      size: 22,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -827,7 +726,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           "Pay all at once",
                           style: TextStyle(
                             color: Color(0xFF0B0B22),
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -836,7 +735,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           "Settle all pending bills in a single click",
                           style: TextStyle(
                             color: Color(0xFF769B9B),
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -871,147 +770,111 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-}
 
-class ScrollingTicker extends StatefulWidget {
-  const ScrollingTicker({super.key});
-
-  @override
-  State<ScrollingTicker> createState() => _ScrollingTickerState();
-}
-
-class _ScrollingTickerState extends State<ScrollingTicker> {
-  late ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _startScrolling());
-  }
-
-  void _startScrolling() async {
-    while (mounted) {
-      await Future.delayed(const Duration(milliseconds: 50));
-      if (_scrollController.hasClients) {
-        final maxScroll = _scrollController.position.maxScrollExtent;
-        final currentScroll = _scrollController.position.pixels;
-        if (currentScroll >= maxScroll) {
-          _scrollController.jumpTo(0);
-        } else {
-          _scrollController.animateTo(
-            currentScroll + 1.5,
-            duration: const Duration(milliseconds: 50),
-            curve: Curves.linear,
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 38,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE2F9F9).withOpacity(0.4),
-        border: const Border(
-          top: BorderSide(color: Color(0xFFD3EBEB), width: 1),
-          bottom: BorderSide(color: Color(0xFFD3EBEB), width: 1),
-        ),
-      ),
-      child: ListView.builder(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            alignment: Alignment.center,
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.wb_sunny_rounded,
-                  color: Color(0xFFFF9F0A),
-                  size: 14,
-                ),
-                const SizedBox(width: 6),
-                const Text(
-                  "Heatwave alert in Hyderabad",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F5A5A),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Container(
-                  height: 4,
-                  width: 4,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF769B9B),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                const Icon(
-                  Icons.location_on_rounded,
-                  color: Color(0xFFFF453A),
-                  size: 14,
-                ),
-                const SizedBox(width: 4),
-                const Text(
-                  "Hyderabad, TS",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F5A5A),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Container(
-                  height: 4,
-                  width: 4,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF769B9B),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                const Icon(
-                  Icons.schedule,
-                  color: Color(0xFF0A84FF),
-                  size: 14,
-                ),
-                const SizedBox(width: 4),
-                const Text(
-                  "Live Weather Update",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F5A5A),
-                  ),
-                ),
-                const SizedBox(width: 24),
-                Container(
-                  height: 6,
-                  width: 6,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFBEE7E7),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ],
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Column(
+        children: [
+          const Text(
+            "Designed & Developed By",
+            style: TextStyle(
+              color: Color(0xFF8A9A9A),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
             ),
-          );
-        },
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/logo.png",
+                height: 28,
+                width: 28,
+              ),
+              const SizedBox(width: 8),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "CENTRE FOR GOOD GOVERNANCE",
+                    style: TextStyle(
+                      color: Color(0xFF19B9B9),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    "Knowledge • Technology • People",
+                    style: TextStyle(
+                      color: Color(0xFF8A9A9A),
+                      fontSize: 8,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
+
+class RibbonPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF0C4DA2)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(size.width - 12, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+
+    // Draw dashed inner border
+    final dashPaint = Paint()
+      ..color = Colors.white.withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    final dashPath = Path();
+    dashPath.moveTo(2, 2);
+    dashPath.lineTo(size.width - 13, 2);
+    dashPath.lineTo(size.width - 3, size.height - 2);
+    dashPath.lineTo(2, size.height - 2);
+    dashPath.close();
+
+    _drawDashedPath(canvas, dashPath, dashPaint);
+  }
+
+  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
+    const dashWidth = 3.0;
+    const dashSpace = 2.0;
+    double distance = 0.0;
+    for (final pathMetric in path.computeMetrics()) {
+      while (distance < pathMetric.length) {
+        canvas.drawPath(
+          pathMetric.extractPath(distance, distance + dashWidth),
+          paint,
+        );
+        distance += dashWidth + dashSpace;
+      }
+      distance = 0.0;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+

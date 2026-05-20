@@ -27,3 +27,13 @@ flutter:
     - assets/logo.png
     - assets/property_tax_banner.png
     - assets/water_bill_banner.png
+    - assets/electricity_banner.png
+    - assets/trade_license_banner.png
+    - assets/echallan_banner.png
+    - assets/broadband_banner.png
+    - assets/property_tax_photo.png
+    - assets/water_bill_photo.png
+    - assets/electricity_photo.png
+    - assets/trade_license_photo.png
+    - assets/echallan_photo.png
+    - assets/broadband_photo.png
