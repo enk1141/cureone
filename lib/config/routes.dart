@@ -22,6 +22,7 @@ class AppRoutes {
   static const String utilityDetails = '/utility-details';
   static const String payAllAtOnce = '/pay-all-at-once';
   static const String paymentConfirmation = '/payment-confirmation';
+static String get validateMpin => enterMpin;
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

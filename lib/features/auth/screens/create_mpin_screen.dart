@@ -58,30 +58,25 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
           child: BlocConsumer<MpinBloc, MpinState>(
             listener: (context, state) {
               if (state is MpinMismatch) {
-                //
                 ScaffoldMessenger.of(context).showSnackBar(
-                  //
                   SnackBar(
                       content: Text(state.error),
-                      backgroundColor: Colors.redAccent), //
-                ); //
-                // Clear the confirm controllers on mismatch so they can retry cleanly
+                      backgroundColor: Colors.redAccent),
+                );
                 for (var controller in _confirmControllers) {
-                  //
-                  controller.clear(); //
-                } //
-                _confirmFocusNodes[0].requestFocus(); //
+                  controller.clear();
+                }
+                _confirmFocusNodes[0].requestFocus();
               } else if (state is MpinSuccess) {
-                //
                 ScaffoldMessenger.of(context).showSnackBar(
-                  //
                   const SnackBar(
                     content: Text("MPIN Created! Now verify it."),
                     backgroundColor: primaryTeal,
-                  ), //
-                ); //
+                  ),
+                );
 
-                String createdMpin = _controllers.map((c) => c.text).join();
+                // 🟢 FIX: Call your clean helper method instead of the null _controllers list
+                String createdMpin = _getMpin();
 
                 // Navigate to validation screen
                 Navigator.pushNamed(
