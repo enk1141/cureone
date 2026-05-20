@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/dashboard/screens/dashboard.dart';
 import 'package:my_cure_ui/features/auth/screens/otpscreen.dart';
 import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
+import 'package:my_cure_ui/config/routes.dart';
 
 class EnterMpinLoginScreen extends StatefulWidget {
   final String mobileNumber;
@@ -43,10 +44,9 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
           child: BlocConsumer<MpinBloc, MpinState>(
             listener: (context, state) {
               if (state is LoginMpinSuccess) {
-                Navigator.pushAndRemoveUntil(
+                Navigator.pushNamedAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const DashboardScreen()),
+                  AppRoutes.dashboard,
                   (route) => false,
                 );
               } else if (state is LoginMpinFailure) {
@@ -220,15 +220,10 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                           onPressed: isLoading
                                               ? null
                                               : () {
-                                                  Navigator.push(
+                                                  Navigator.pushNamed(
                                                     context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          OtpScreen(
-                                                        mobileNumber:
-                                                            widget.mobileNumber,
-                                                      ),
-                                                    ),
+                                                    AppRoutes.otp,
+                                                    arguments: widget.mobileNumber,
                                                   );
                                                 },
                                           style: TextButton.styleFrom(

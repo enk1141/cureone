@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/auth/bloc/otp/otp_block.dart';
-import 'package:my_cure_ui/features/auth/screens/create_mpin_screen.dart';
+import 'package:my_cure_ui/config/routes.dart';
 
 class OtpScreen extends StatefulWidget {
   final String mobileNumber;
@@ -64,11 +64,9 @@ class _OtpScreenState extends State<OtpScreen> {
                       backgroundColor: Colors.redAccent),
                 );
               } else if (state is OtpSuccess) {
-                Navigator.pushReplacement(
+                Navigator.pushReplacementNamed(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const CreateMpinScreen(),
-                  ),
+                  AppRoutes.createMpin,
                 );
               }
             },

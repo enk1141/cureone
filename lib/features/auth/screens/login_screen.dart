@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:my_cure_ui/features/auth/bloc/login/login_bloc.dart';
-import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
-import 'package:my_cure_ui/features/auth/screens/enter_mpin_screen.dart';
-import 'package:my_cure_ui/features/auth/screens/otpscreen.dart';
+import 'package:my_cure_ui/config/routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -57,25 +55,16 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginOtpSent) {
-              // NEW/UNREGISTERED USER: Route to OTP Verification Screen
-              Navigator.push(
+              Navigator.pushNamed(
                 context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      OtpScreen(mobileNumber: _phoneController.text.trim()),
-                ),
+                AppRoutes.otp,
+                arguments: _phoneController.text.trim(),
               );
             } else if (state is LoginExistingUserSuccess) {
-              Navigator.push(
+              Navigator.pushNamed(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider<MpinBloc>(
-                    create: (context) =>
-                        MpinBloc(), // Instantiates a fresh Bloc for this screen
-                    child: EnterMpinLoginScreen(
-                        mobileNumber: _phoneController.text.trim()),
-                  ),
-                ),
+                AppRoutes.enterMpin,
+                arguments: _phoneController.text.trim(),
               );
             }
 

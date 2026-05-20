@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
-import 'package:my_cure_ui/features/dashboard/screens/dashboard.dart';
+import 'package:my_cure_ui/config/routes.dart';
 
 class CreateMpinScreen extends StatefulWidget {
   const CreateMpinScreen({super.key});
@@ -83,12 +83,10 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
 
                 // --- NAVIGATE TO DASHBOARD ---
                 // This clears the navigation stack so hitting 'back' won't take them back to the MPIN setup screen.
-                Navigator.pushAndRemoveUntil(
+                Navigator.pushNamedAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const DashboardScreen(),
-                  ),
-                  (route) => false, // removes all previous routes
+                  AppRoutes.dashboard,
+                  (route) => false,
                 );
               }
             },
