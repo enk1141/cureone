@@ -14,19 +14,27 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentBannerIndex = 0;
 
+  String _getMonthName(int month) {
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+  return months[month - 1];
+}
+
   // Define service themes (icon, color, glow color)
   Map<String, dynamic> _getServiceTheme(String type) {
     switch (type) {
       case 'electricity':
         return {
           'icon': Icons.bolt_rounded,
-          'color': const Color(0xFFFF9F0A), // Warm orange/amber
+          'color': const Color(0xFFFF9F0A),
           'shadowColor': const Color(0xFFFF9F0A).withOpacity(0.25),
         };
       case 'hmwssb':
         return {
           'icon': Icons.water_drop_rounded,
-          'color': const Color(0xFF0A84FF), // Radiant blue
+          'color': const Color(0xFF0A84FF),
           'shadowColor': const Color(0xFF0A84FF).withOpacity(0.25),
         };
       case 'property_tax':
@@ -87,6 +95,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 12),
                   _buildBannerCarousel(),
                   const SizedBox(height: 18),
+                  BlocBuilder<DashboardBloc, DashboardState>(
+                    builder: (context, state) {
+                      return _buildSummaryCard(state);
+                    },
+                  ),
+                  const SizedBox(height: 14),
                   _buildPayAllAtOnceCard(),
                   const SizedBox(height: 14),
                   _buildAllServicesHeader(),
@@ -537,7 +551,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
+          padding:
+              const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 10,
@@ -556,10 +571,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             return Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1435),
+                color: Colors.white.withOpacity(0.06),
+
+                // color: const Color(0xFF1E1435),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF2D1F49),
+                  color: Colors.white.withOpacity(0.12),
+                  // color: const Color(0xFF2D1F49),
                   width: 1,
                 ),
               ),
@@ -622,15 +640,103 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Widget _buildSummaryCard(DashboardState state) {
+  final now = DateTime.now();
+
+  // ✅ STRICT filter → only current month + year
+  final monthlyBills = state.utilityBills.where((b) =>
+      b['month'] == now.month &&
+      b['year'] == now.year).toList();
+
+  // ✅ Pending (ONLY this month)
+  final pendingBills =
+      monthlyBills.where((b) => !(b['isPaid'] ?? false)).length;
+
+  // ✅ Paid (ONLY this month)
+  final paidBills =
+      monthlyBills.where((b) => (b['isPaid'] ?? false)).length;
+
+  // ✅ Amount (ONLY pending this month)
+  final totalAmount = monthlyBills
+      .where((b) => !(b['isPaid'] ?? false))
+      .fold(0.0, (sum, item) => sum + (item['amount'] as double));
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Pending (${_getMonthName(now.month)})",
+                    style: const TextStyle(color: Color(0xFF8A9A9A), fontSize: 11),
+                  ),
+                  Text("$pendingBills",
+                      style: const TextStyle(
+                          color: Color(0xFFFF9F0A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "Paid (${_getMonthName(now.month)})",
+                    style: const TextStyle(color: Color(0xFF8A9A9A), fontSize: 11),
+                  ),
+                  Text("$paidBills",
+                      style: const TextStyle(
+                          color: Color(0xFF30D158),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(height: 1, color: Colors.white.withOpacity(0.08)),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Pending Amount",
+                  style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+              Text("₹${totalAmount.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                      color: Color(0xFF19B9B9),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
   Widget _buildPayAllAtOnceCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1435),
+          color: Colors.white.withOpacity(0.06),
+          // color: const Color(0xFF1E1435),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: const Color(0xFF2D1F49),
+            color: Colors.white.withOpacity(0.12),
+            // color: const Color(0xFF2D1F49),
             width: 1,
           ),
         ),
@@ -822,4 +928,3 @@ class RibbonPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-

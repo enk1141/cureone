@@ -215,13 +215,18 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
         final bool allSelected = catBills.isNotEmpty && catBills.every((b) => b['isSelected'] as bool);
 
         return Scaffold(
-          floatingActionButton: FloatingActionButton(
+          floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 7),
+          child: FloatingActionButton(
             backgroundColor: catColor,
             elevation: 8,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             onPressed: () => _showAddUtilityDialog(context, catColor, catTitle),
             child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
           body: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
