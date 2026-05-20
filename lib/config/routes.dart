@@ -8,6 +8,7 @@ import 'package:my_cure_ui/features/auth/screens/otpscreen.dart';
 import 'package:my_cure_ui/features/auth/screens/create_mpin_screen.dart';
 import 'package:my_cure_ui/features/auth/screens/enter_mpin_screen.dart';
 import 'package:my_cure_ui/features/dashboard/screens/dashboard.dart';
+import 'package:my_cure_ui/features/dashboard/screens/payment_confirmation_screen.dart';
 import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
 
 class AppRoutes {
@@ -16,6 +17,7 @@ class AppRoutes {
   static const String createMpin = '/create-mpin';
   static const String enterMpin = '/enter-mpin';
   static const String dashboard = '/dashboard';
+  static const String paymentConfirmation = '/payment-confirmation';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -62,6 +64,18 @@ class AppRoutes {
           builder: (_) => BlocProvider(
             create: (_) => DashboardBloc(),
             child: const DashboardScreen(),
+          ),
+          settings: settings,
+        );
+
+      case paymentConfirmation:
+        final args = settings.arguments as Map<String, dynamic>;
+        final selectedBills = args['selectedBills'] as List<Map<String, dynamic>>;
+        final bloc = args['bloc'] as DashboardBloc;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: bloc,
+            child: PaymentConfirmationScreen(selectedBills: selectedBills),
           ),
           settings: settings,
         );
