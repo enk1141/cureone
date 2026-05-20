@@ -87,6 +87,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 12),
                   _buildBannerCarousel(),
                   const SizedBox(height: 18),
+                  BlocBuilder<DashboardBloc, DashboardState>(
+                    builder: (context, state) {
+                      return _buildSummaryCard(state);
+                    },
+                  ),
+                  const SizedBox(height: 14),
                   _buildPayAllAtOnceCard(),
                   const SizedBox(height: 14),
                   _buildAllServicesHeader(),
@@ -537,7 +543,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
+          padding:
+              const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 10,
@@ -769,6 +776,94 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+  Widget _buildSummaryCard(DashboardState state) {
+    final currentMonth = DateTime.now().month;
+
+    final monthlyBills =
+        state.utilityBills.where((b) => b['month'] == currentMonth).toList();
+
+    final pendingBills =
+        monthlyBills.where((b) => !(b['isPaid'] ?? false)).length;
+
+    final paidBills = monthlyBills.where((b) => (b['isPaid'] ?? false)).length;
+
+    final totalAmount = monthlyBills
+        .where((b) => !(b['isPaid'] ?? false))
+        .fold(0.0, (sum, item) => sum + (item['amount'] as double));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+        ),
+        child: Column(
+          children: [
+            // Top Row → Pending & Paid
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Pending Bills (This Month)",
+                        style:
+                            TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                    Text("$pendingBills",
+                        style: const TextStyle(
+                            color: Color(0xFFFF9F0A), // orange
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text("Paid Bills (This Month)",
+                        style:
+                            TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                    Text("$paidBills",
+                        style: const TextStyle(
+                            color: Color(0xFF30D158), // green
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Divider
+            Container(
+              height: 1,
+              color: Colors.white.withOpacity(0.08),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Bottom Row → Total Amount
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Total Amount",
+                    style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                Text("₹${totalAmount.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                        color: Color(0xFF19B9B9),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class RibbonPainter extends CustomPainter {
@@ -822,4 +917,3 @@ class RibbonPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
