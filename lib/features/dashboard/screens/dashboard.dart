@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
+import 'package:my_cure_ui/config/routes.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -567,7 +568,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
-                    // Navigate or perform action
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.utilityDetails,
+                      arguments: {
+                        'category': type,
+                        'bloc': BlocProvider.of<DashboardBloc>(context),
+                      },
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(10),
@@ -631,7 +639,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: InkWell(
             borderRadius: BorderRadius.circular(24),
             onTap: () {
-              // Action
+              Navigator.pushNamed(
+                context,
+                AppRoutes.payAllAtOnce,
+                arguments: BlocProvider.of<DashboardBloc>(context),
+              );
             },
             child: Padding(
               padding: const EdgeInsets.all(20),
