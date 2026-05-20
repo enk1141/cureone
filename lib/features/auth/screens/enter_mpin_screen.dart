@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/dashboard/dashboard.dart';
-import 'package:my_cure_ui/otpscreen.dart';
-
-import 'bloc/mpin_bloc.dart';
-import 'bloc/mpin_event.dart';
-import 'bloc/mpin_state.dart';
+import 'package:my_cure_ui/features/dashboard/screens/dashboard.dart';
+import 'package:my_cure_ui/features/auth/screens/otpscreen.dart';
+import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
 
 class EnterMpinLoginScreen extends StatefulWidget {
   final String mobileNumber;

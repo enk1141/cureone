@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/bloc/login_bloc.dart';
-import 'package:my_cure_ui/bloc/mpin_bloc.dart';
-import 'package:my_cure_ui/enter_mpin_screen.dart';
-import 'package:my_cure_ui/otpscreen.dart';
 import 'package:flutter/services.dart';
+import 'package:my_cure_ui/features/auth/bloc/login/login_bloc.dart';
+import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
+import 'package:my_cure_ui/features/auth/screens/enter_mpin_screen.dart';
+import 'package:my_cure_ui/features/auth/screens/otpscreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

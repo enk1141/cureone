@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/bloc/otp_block.dart';
-import 'package:my_cure_ui/bloc/otp_event.dart';
-import 'package:my_cure_ui/bloc/otp_state.dart';
-import 'package:my_cure_ui/create_mpin_screen.dart';
+import 'package:my_cure_ui/features/auth/bloc/otp/otp_block.dart';
+import 'package:my_cure_ui/features/auth/screens/create_mpin_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   final String mobileNumber;

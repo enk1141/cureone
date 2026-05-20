@@ -1,3 +1,5 @@
+part of 'mpin_bloc.dart';
+
 abstract class MpinEvent {} //
 
 class SetMpinSubmitted extends MpinEvent { //

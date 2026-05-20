@@ -1,3 +1,5 @@
+part of 'otp_block.dart';
+
 abstract class OtpEvent {}
 
 class OtpCodeChanged extends OtpEvent {

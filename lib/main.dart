@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/bloc/login_bloc.dart';
-import 'package:my_cure_ui/login_screen.dart';
+import 'package:my_cure_ui/features/auth/bloc/login/login_bloc.dart';
+import 'package:my_cure_ui/features/auth/screens/login_screen.dart';
 
 void main() {
   runApp(const MyApp());

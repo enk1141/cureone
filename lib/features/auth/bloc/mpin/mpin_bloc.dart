@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'mpin_event.dart';
-import 'mpin_state.dart';
+part 'mpin_event.dart';
+part 'mpin_state.dart';
 
 class MpinBloc extends Bloc<MpinEvent, MpinState> {
   MpinBloc() : super(MpinInitial()) {

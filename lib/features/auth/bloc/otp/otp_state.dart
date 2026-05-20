@@ -1,3 +1,5 @@
+part of 'otp_block.dart';
+
 abstract class OtpState {}
 
 class OtpInitial extends OtpState {}

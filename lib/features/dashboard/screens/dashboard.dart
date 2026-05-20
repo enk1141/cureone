@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dashboard_bloc.dart';
-import 'dashboard_event.dart';
-import 'dashboard_state.dart';
+import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

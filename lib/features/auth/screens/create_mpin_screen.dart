@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/bloc/mpin_bloc.dart';
-import 'package:my_cure_ui/bloc/mpin_event.dart';
-import 'package:my_cure_ui/bloc/mpin_state.dart';
-import 'package:my_cure_ui/dashboard/dashboard.dart';
+import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
+import 'package:my_cure_ui/features/dashboard/screens/dashboard.dart';
 
 class CreateMpinScreen extends StatefulWidget {
   const CreateMpinScreen({super.key});
