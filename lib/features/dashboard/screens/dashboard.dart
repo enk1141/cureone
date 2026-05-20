@@ -64,12 +64,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
               colors: [
-                Color(0xFFE8F7F7), // Soft teal/cyan tint
-                Color(0xFFF4F9F9), // Light background
-                Colors.white,
+                Color(0xFF0F0720), // Deep violet-black
+                Color(0xFF160E2A), // Dark purple
+                Color(0xFF0F0720),
               ],
             ),
           ),
@@ -125,55 +125,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
         children: [
-          // Logo container matching design
+          // Profile Avatar with gradient border
           Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFFE2F0F0),
-                width: 1.5,
+            padding: const EdgeInsets.all(2),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFF19B9B9), Color(0xFF24BDBD)],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Image.asset(
-                "assets/logo.png",
-                fit: BoxFit.contain,
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: const Color(0xFF1E1435),
+              child: ClipOval(
+                child: Image.asset(
+                  "assets/logo.png",
+                  fit: BoxFit.contain,
+                  height: 22,
+                  width: 22,
+                ),
               ),
             ),
           ),
           const SizedBox(width: 12),
-          // App Title
+          // User location / app branding info
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  "CURE ONE",
-                  style: TextStyle(
-                    color: Color(0xFF19B9B9),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      "CURE ONE",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Color(0xFF19B9B9),
+                      size: 16,
+                    ),
+                  ],
                 ),
                 Text(
-                  "Core Urban Region.",
+                  "Core Urban Region - CGG",
                   style: TextStyle(
-                    color: Color(0xFF769B9B),
+                    color: Color(0xFF8A9A9A),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
@@ -181,15 +187,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
-          // Action Buttons
+          // Action Buttons: QR Scan, Settings, Notifications
           Row(
             children: [
-              const SizedBox(width: 10),
+              _buildHeaderButton(
+                icon: Icons.qr_code_scanner_rounded,
+                onPressed: () {},
+              ),
+              const SizedBox(width: 8),
               _buildHeaderButton(
                 icon: Icons.settings_outlined,
                 onPressed: () {},
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               _buildHeaderButton(
                 icon: Icons.notifications_none_rounded,
                 hasBadge: true,
@@ -210,34 +220,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Stack(
       children: [
         Container(
-          height: 44,
-          width: 44,
+          height: 38,
+          width: 38,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: const Color(0xFF1E1435),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: const Color(0xFF2D1F49),
+              width: 1,
+            ),
           ),
           child: IconButton(
-            icon: Icon(icon, color: const Color(0xFF0B0B22), size: 20),
+            icon: Icon(icon, color: Colors.white, size: 18),
             onPressed: onPressed,
-            splashRadius: 22,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            splashRadius: 20,
           ),
         ),
         if (hasBadge)
           Positioned(
-            right: 12,
-            top: 12,
+            right: 2,
+            top: 2,
             child: Container(
-              height: 8,
-              width: 8,
+              height: 7,
+              width: 7,
               decoration: const BoxDecoration(
-                color: Color(0xFFFF453A), // Red badge dot
+                color: Color(0xFFFF453A),
                 shape: BoxShape.circle,
               ),
             ),
@@ -288,14 +297,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         badgeRest: "on TRAFFIC CHALLANS",
         photoAsset: "assets/echallan_photo.png",
       ),
-      _buildBannerCard(
-        line1: "PAY BROADBAND BILL",
-        line2: "THE EASY WAY",
-        tagline: "Pay your Broadband Bill on MYCURE",
-        badgeHighlight: "QUICK PAY",
-        badgeRest: "on BROADBAND",
-        photoAsset: "assets/broadband_photo.png",
-      ),
     ];
 
     return SizedBox(
@@ -342,8 +343,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(3),
                     color: _currentBannerIndex == entry.key
-                        ? const Color(0xFF0C4DA2)
-                        : const Color(0xFF0C4DA2).withOpacity(0.3),
+                        ? const Color(0xFF19B9B9)
+                        : const Color(0xFF19B9B9).withOpacity(0.3),
                   ),
                 );
               }).toList(),
@@ -369,14 +370,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            Color(0xFFEBF3FC),
-            Color(0xFFF5F9FD),
-            Color(0xFFFFFFFF),
+            Color(0xFF1E1435),
+            Color(0xFF251A43),
+            Color(0xFF1E1435),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFFEBF3FC),
+          color: const Color(0xFF2D1F49),
           width: 1,
         ),
       ),
@@ -404,9 +405,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           begin: Alignment.centerRight,
                           end: Alignment.centerLeft,
                           colors: [
-                            Color(0x00FFFFFF),
-                            Color(0x80FFFFFF),
-                            Color(0xFFFFFFFF),
+                            Color(0x001E1435),
+                            Color(0x801E1435),
+                            Color(0xFF1E1435),
                           ],
                           stops: [0.0, 0.5, 0.95],
                         ),
@@ -431,7 +432,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF0F2E5C),
+                            color: Colors.white,
                             height: 1.15,
                             letterSpacing: 0.1,
                           ),
@@ -441,7 +442,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF0F2E5C),
+                            color: Colors.white,
                             height: 1.15,
                             letterSpacing: 0.1,
                           ),
@@ -452,7 +453,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           style: const TextStyle(
                             fontSize: 8.5,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF3BA14E),
+                            color: Color(0xFF30D158),
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -461,7 +462,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           style: TextStyle(
                             fontSize: 7.5,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF777777),
+                            color: Colors.grey,
                           ),
                         ),
                       ],
@@ -510,7 +511,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Text(
         "Utility Services",
         style: TextStyle(
-          color: Color(0xFF0B0B22),
+          color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.w800,
         ),
@@ -535,12 +536,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(left: 22, right: 22, top: 2, bottom: 8),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 18,
-            mainAxisSpacing: 18,
-            childAspectRatio: 1.05,
+            crossAxisCount: 3,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.88,
           ),
           itemCount: state.bills.length,
           itemBuilder: (context, index) {
@@ -551,112 +552,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             final IconData iconData = theme['icon'] as IconData;
             final Color accentColor = theme['color'] as Color;
-            final Color shadowColor = theme['shadowColor'] as Color;
 
             return Container(
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: shadowColor,
-                    blurRadius: 16,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 8),
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.01),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: const Color(0xFF1E1435),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFF2D1F49),
+                  width: 1,
+                ),
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     // Navigate or perform action
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.all(10),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Icon circle
-                            Container(
-                              height: 28,
-                              width: 28,
-                              decoration: BoxDecoration(
-                                color: accentColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: accentColor.withOpacity(0.3),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                iconData,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            // Service Title
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                color: Color(0xFF0B0B22),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
+                        // Icon circle with subtle glow background
+                        Container(
+                          height: 38,
+                          width: 38,
+                          decoration: BoxDecoration(
+                            color: accentColor.withOpacity(0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            iconData,
+                            color: accentColor,
+                            size: 20,
+                          ),
                         ),
-                        // Bottom row: "Open ->" and mini arrow button
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Open",
-                                  style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.arrow_forward,
-                                  color: accentColor,
-                                  size: 12,
-                                ),
-                              ],
-                            ),
-                            Container(
-                              height: 24,
-                              width: 24,
-                              decoration: BoxDecoration(
-                                color: accentColor.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.chevron_right_rounded,
-                                color: accentColor,
-                                size: 14,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 10),
+                        // Service Title
+                        Text(
+                          title,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
+                          ),
                         ),
                       ],
                     ),
@@ -675,21 +619,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF1E1435),
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF19B9B9).withOpacity(0.12),
-              blurRadius: 20,
-              spreadRadius: 0,
-              offset: const Offset(0, 8),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.01),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: Border.all(
+            color: const Color(0xFF2D1F49),
+            width: 1,
+          ),
         ),
         child: Material(
           color: Colors.transparent,
@@ -706,7 +641,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     height: 46,
                     width: 46,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF19B9B9).withOpacity(0.1),
+                      color: const Color(0xFF19B9B9).withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -723,7 +658,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Text(
                           "Pay all at once",
                           style: TextStyle(
-                            color: Color(0xFF0B0B22),
+                            color: Colors.white,
                             fontSize: 14,
                             fontWeight: FontWeight.w800,
                           ),
@@ -732,7 +667,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Text(
                           "Settle all pending bills in a single click",
                           style: TextStyle(
-                            color: Color(0xFF769B9B),
+                            color: Color(0xFF8A9A9A),
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                           ),
