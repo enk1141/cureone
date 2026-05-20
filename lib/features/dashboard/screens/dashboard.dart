@@ -65,12 +65,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
-                Color(0xFF0F0720), // Deep violet-black
-                Color(0xFF160E2A), // Dark purple
-                Color(0xFF0F0720),
+                Color(0xFF0A2540), // Deep navy blue
+                Color(0xFF1A3A52), // Teal-blue
+                Color(0xFF0F2F45), // Ocean blue
               ],
             ),
           ),
@@ -91,9 +91,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 14),
                   _buildAllServicesHeader(),
                   _buildServicesGrid(),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 5),
                   _buildFooter(),
-                  const SizedBox(height: 32),
+                  //const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -112,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             "Welcome",
             style: TextStyle(
-              color: Color(0xFF19B9B9),
+              color: Color(0xFF00D9FF),
               fontSize: 20,
               fontWeight: FontWeight.w900,
               fontFamily: 'Inter',
@@ -135,12 +135,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [Color(0xFF19B9B9), Color(0xFF24BDBD)],
+                colors: [Color(0xFF00D9FF), Color(0xFF00F5FF)],
               ),
             ),
             child: CircleAvatar(
               radius: 18,
-              backgroundColor: const Color(0xFF1E1435),
+              backgroundColor: const Color(0xFF0F2F45),
               child: ClipOval(
                 child: Image.asset(
                   "assets/logo.png",
@@ -172,7 +172,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     SizedBox(width: 4),
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF19B9B9),
+                      color: Color(0xFF00D9FF),
                       size: 16,
                     ),
                   ],
@@ -191,11 +191,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Action Buttons: QR Scan, Settings, Notifications
           Row(
             children: [
-              _buildHeaderButton(
-                icon: Icons.qr_code_scanner_rounded,
-                onPressed: () {},
-              ),
-              const SizedBox(width: 8),
               _buildHeaderButton(
                 icon: Icons.settings_outlined,
                 onPressed: () {},
@@ -224,10 +219,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           height: 38,
           width: 38,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1435),
+            color: const Color(0xFF1A3A52),
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFF2D1F49),
+              color: const Color(0xFF2D5A7B),
               width: 1,
             ),
           ),
@@ -344,8 +339,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(3),
                     color: _currentBannerIndex == entry.key
-                        ? const Color(0xFF19B9B9)
-                        : const Color(0xFF19B9B9).withOpacity(0.3),
+                        ? const Color(0xFF00D9FF)
+                        : const Color(0xFF00D9FF).withOpacity(0.3),
                   ),
                 );
               }).toList(),
@@ -371,14 +366,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            Color(0xFF1E1435),
-            Color(0xFF251A43),
-            Color(0xFF1E1435),
+            Color(0xFF1A3A52),
+            Color(0xFF234B63),
+            Color(0xFF1A3A52),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFF2D1F49),
+          color: const Color(0xFF2D5A7B),
           width: 1,
         ),
       ),
@@ -406,9 +401,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           begin: Alignment.centerRight,
                           end: Alignment.centerLeft,
                           colors: [
-                            Color(0x001E1435),
-                            Color(0x801E1435),
-                            Color(0xFF1E1435),
+                            Color(0x001A3A52),
+                            Color(0x801A3A52),
+                            Color(0xFF1A3A52),
                           ],
                           stops: [0.0, 0.5, 0.95],
                         ),
@@ -528,7 +523,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Padding(
               padding: EdgeInsets.all(40),
               child: CircularProgressIndicator(
-                color: Color(0xFF19B9B9),
+                color: Color(0xFF00D9FF),
               ),
             ),
           );
@@ -537,7 +532,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
+          padding:
+              const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 10,
@@ -556,10 +552,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             return Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1435),
+                color: const Color(0xFF1A3A52),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF2D1F49),
+                  color: const Color(0xFF2D5A7B),
                   width: 1,
                 ),
               ),
@@ -627,10 +623,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1435),
+          color: const Color(0xFF1A3A52),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: const Color(0xFF2D1F49),
+            color: const Color(0xFF2D5A7B),
             width: 1,
           ),
         ),
@@ -653,12 +649,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     height: 46,
                     width: 46,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF19B9B9).withOpacity(0.12),
+                      color: const Color(0xFF00D9FF).withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.payments_rounded,
-                      color: Color(0xFF19B9B9),
+                      color: Color(0xFF00D9FF),
                       size: 22,
                     ),
                   ),
@@ -691,11 +687,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     height: 36,
                     width: 36,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF19B9B9),
+                      color: const Color(0xFF00D9FF),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF19B9B9).withOpacity(0.3),
+                          color: const Color(0xFF00D9FF).withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -746,7 +742,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(
                     "CENTRE FOR GOOD GOVERNANCE",
                     style: TextStyle(
-                      color: Color(0xFF19B9B9),
+                      color: Color(0xFF00D9FF),
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.2,
@@ -822,4 +818,3 @@ class RibbonPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
