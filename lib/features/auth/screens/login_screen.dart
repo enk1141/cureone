@@ -46,8 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
     // Custom Color Palette
     const Color primaryTeal = Color(0xFF19B9B9); //
     const Color accentTeal = Color(0xFF24BDBD); //
-    const Color darkText = Color(0xFF0B0B22); //
-    const Color lightBg = Color(0xFFF4F9F9); //
+    const Color darkText = Colors.white; //
+    const Color lightBg = Color(0xFF0F0720); //
 
     return Scaffold(
       backgroundColor: lightBg, //
@@ -91,10 +91,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 90, //
                       width: 90, //
                       decoration: BoxDecoration(
-                        color: Colors.white, //
+                        color: const Color(0xFF1E1435), //
                         borderRadius: BorderRadius.circular(24), //
                         border: Border.all(
-                          color: const Color(0xFFE5DFFF), //
+                          color: const Color(0xFF2D1F49), //
                           width: 1, //
                         ),
                       ),
@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       "Sign in with your mobile number to continue", //
                       textAlign: TextAlign.center, //
                       style: TextStyle(
-                        color: Colors.grey.shade600, //
+                        color: Colors.grey.shade400, //
                         fontSize: 14, //
                         fontWeight: FontWeight.w400, //
                       ),
@@ -145,11 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(20), //
                       decoration: BoxDecoration(
-                        color: Colors.white, //
+                        color: const Color(0xFF1E1435), //
                         borderRadius: BorderRadius.circular(28), //
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(.03), //
+                            color: Colors.black.withOpacity(.2), //
                             blurRadius: 20, //
                             offset: const Offset(0, 8), //
                           ),
@@ -177,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   vertical: 5, //
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE8FAF7), //
+                                  color: const Color(0xFF281F3D), //
                                   borderRadius: BorderRadius.circular(12), //
                                 ),
                                 child: const Row(
@@ -211,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 // Changes border color to red if an validation error exists
                                 color: _validationError != null
                                     ? Colors.redAccent
-                                    : accentTeal,
+                                    : accentTeal.withOpacity(0.5),
                                 width: 1.5, //
                               ),
                               borderRadius: BorderRadius.circular(16), //
@@ -224,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12), //
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF2F7F8), //
+                                    color: const Color(0xFF281F3D), //
                                     borderRadius: BorderRadius.circular(12), //
                                   ),
                                   child: const Row(
@@ -273,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               horizontal: 4), //
                                       hintText: "Enter mobile number", //
                                       hintStyle: TextStyle(
-                                        color: Colors.grey.shade400, //
+                                        color: Colors.grey.shade500, //
                                         fontSize: 15, //
                                         fontWeight: FontWeight.w400, //
                                       ),
@@ -385,10 +385,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 10, //
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white, //
+                        color: const Color(0xFF1E1435), //
                         borderRadius: BorderRadius.circular(30), //
                         border: Border.all(
-                          color: Colors.grey.shade200, //
+                          color: const Color(0xFF2D1F49), //
                         ),
                       ),
                       child: const Row(
@@ -407,7 +407,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.w600, //
                                 fontSize: 12, //
-                                color: Color(0xFF3D3D4E), //
+                                color: Colors.white, //
                               ),
                             ),
                           ),
@@ -420,7 +420,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       "Version 1.0.0", //
                       style: TextStyle(
-                        color: Colors.grey.shade400, //
+                        color: Colors.grey.shade500, //
                         fontSize: 12, //
                       ),
                     ),

@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'MY CURE',
       theme: ThemeData(
         fontFamily: 'Roboto',
-        scaffoldBackgroundColor: const Color(0xFFF4FCFC),
+        scaffoldBackgroundColor: const Color(0xFF0F0720),
       ),
       onGenerateRoute: AppRoutes.generateRoute,
       initialRoute: AppRoutes.login,

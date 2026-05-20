@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/features/dashboard/screens/dashboard.dart';
-import 'package:my_cure_ui/features/auth/screens/otpscreen.dart';
 import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
 import 'package:my_cure_ui/config/routes.dart';
 
@@ -34,12 +32,12 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
   Widget build(BuildContext context) {
     const Color primaryTeal = Color(0xFF19B9B9);
     const Color accentTeal = Color(0xFF24BDBD);
-    const Color darkText = Color(0xFF0B0B22);
+    const Color darkText = Colors.white;
 
     return BlocProvider<MpinBloc>(
       create: (context) => MpinBloc(),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF4F9F9),
+        backgroundColor: const Color(0xFF0F0720),
         body: SafeArea(
           child: BlocConsumer<MpinBloc, MpinState>(
             listener: (context, state) {
@@ -76,7 +74,7 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                       ),
                       child: IntrinsicHeight(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
+                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 24),
                           child: Column(
                             children: [
@@ -87,10 +85,10 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                 height: 90,
                                 width: 90,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: const Color(0xFF1E1435),
                                   borderRadius: BorderRadius.circular(24),
                                   border: Border.all(
-                                      color: const Color(0xFFE5DFFF), width: 1),
+                                      color: const Color(0xFF2D1F49), width: 1),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
@@ -121,14 +119,21 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                               Text(
                                 "Enter your 4-digit security MPIN to log in",
                                 style: TextStyle(
-                                    color: Colors.grey.shade600, fontSize: 14),
+                                    color: Colors.grey.shade400, fontSize: 14),
                               ),
                               const SizedBox(height: 32),
                               Container(
                                 padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: const Color(0xFF1E1435),
                                   borderRadius: BorderRadius.circular(28),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(.2),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
                                 ),
                                 child: Column(
                                   children: [
@@ -175,12 +180,14 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                               ),
                                               decoration: InputDecoration(
                                                 counterText: '',
+                                                filled: true,
+                                                fillColor: const Color(0xFF281F3D),
                                                 enabledBorder:
                                                     OutlineInputBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(14),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.grey.shade300,
+                                                  borderSide: const BorderSide(
+                                                    color: Color(0xFF2D1F49),
                                                     width: 1.5,
                                                   ),
                                                 ),
@@ -286,8 +293,8 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                                     CircularProgressIndicator(
                                                   color: Colors.white,
                                                   strokeWidth: 2.5,
-                                                ),
-                                              )
+                                                  ),
+                                                )
                                             : const Text(
                                                 "Unlock App",
                                                 style: TextStyle(

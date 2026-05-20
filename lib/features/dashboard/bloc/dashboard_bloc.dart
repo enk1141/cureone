@@ -11,7 +11,6 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         {"title": "Property Tax", "type": "property_tax"},
         {"title": "Trade License", "type": "trade"},
         {"title": "eChallan", "type": "echallan"},
-        {"title": "Broadband", "type": "broadband"},
       ]));
     });
   }

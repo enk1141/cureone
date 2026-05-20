@@ -39,8 +39,8 @@ class _OtpScreenState extends State<OtpScreen> {
     // Exact matching palette from login screen
     const Color primaryTeal = Color(0xFF19B9B9);
     const Color accentTeal = Color(0xFF24BDBD);
-    const Color darkText = Color(0xFF0B0B22);
-    const Color lightBg = Color(0xFFF4F9F9);
+    const Color darkText = Colors.white;
+    const Color lightBg = Color(0xFF0F0720);
 
     return Scaffold(
       backgroundColor: lightBg,
@@ -84,10 +84,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         height: 90,
                         width: 90,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF1E1435),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                              color: const Color(0xFFE5DFFF), width: 1),
+                              color: const Color(0xFF2D1F49), width: 1),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
@@ -122,7 +122,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         "Enter the 6-digit code sent to\n+91 ${widget.mobileNumber}",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color: Colors.grey.shade400,
                             fontSize: 14,
                             height: 1.4),
                       ),
@@ -132,11 +132,11 @@ class _OtpScreenState extends State<OtpScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF1E1435),
                           borderRadius: BorderRadius.circular(28),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(.03),
+                              color: Colors.black.withOpacity(.2),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
@@ -185,11 +185,13 @@ class _OtpScreenState extends State<OtpScreen> {
                                       ),
                                       decoration: InputDecoration(
                                         counterText: '',
+                                        filled: true,
+                                        fillColor: const Color(0xFF281F3D),
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           borderSide: BorderSide(
-                                              color: Colors.grey.shade300,
+                                              color: const Color(0xFF2D1F49),
                                               width: 1.5),
                                         ),
                                         focusedBorder: OutlineInputBorder(
@@ -267,7 +269,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               children: [
                                 Text("Didn't receive code? ",
                                     style: TextStyle(
-                                        color: Colors.grey.shade500,
+                                        color: Colors.grey.shade400,
                                         fontSize: 13)),
                                 TextButton(
                                   onPressed: () {
@@ -296,9 +298,9 @@ class _OtpScreenState extends State<OtpScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF1E1435),
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.grey.shade200),
+                          border: Border.all(color: const Color(0xFF2D1F49)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
@@ -312,7 +314,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
-                                    color: Color(0xFF3D3D4E)),
+                                    color: Colors.white),
                               ),
                             ),
                           ],
@@ -321,7 +323,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       const SizedBox(height: 16),
                       Text("Version 1.0.0",
                           style: TextStyle(
-                              color: Colors.grey.shade400, fontSize: 12)),
+                              color: Colors.grey.shade500, fontSize: 12)),
                       const SizedBox(height: 24),
                     ],
                   ),
