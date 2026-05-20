@@ -76,17 +76,18 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   //
                   const SnackBar(
-                    content: Text("MPIN Set Successfully!"),
+                    content: Text("MPIN Created! Now verify it."),
                     backgroundColor: primaryTeal,
                   ), //
                 ); //
 
-                // --- NAVIGATE TO DASHBOARD ---
-                // This clears the navigation stack so hitting 'back' won't take them back to the MPIN setup screen.
-                Navigator.pushNamedAndRemoveUntil(
+                String createdMpin = _controllers.map((c) => c.text).join();
+
+                // Navigate to validation screen
+                Navigator.pushNamed(
                   context,
-                  AppRoutes.dashboard,
-                  (route) => false,
+                  AppRoutes.validateMpin,
+                  arguments: createdMpin,
                 );
               }
             },
