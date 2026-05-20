@@ -21,7 +21,7 @@ class AddUtilityBill extends DashboardEvent {
 class ToggleBillSelection extends DashboardEvent {
   final String id;
 
-  ToggleBillSelection({required this.id});
+  ToggleBillSelection({required this.id});//
 }
 
 class ToggleCategoryBillsSelection extends DashboardEvent {
