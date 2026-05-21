@@ -216,7 +216,7 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
 
         return Scaffold(
           floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 7),
+          padding: const EdgeInsets.only(bottom: 80),
           child: FloatingActionButton(
             backgroundColor: catColor,
             elevation: 8,

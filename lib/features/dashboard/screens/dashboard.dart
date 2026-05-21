@@ -14,13 +14,9 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentBannerIndex = 0;
 
-  String _getMonthName(int month) {
-  const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  ];
-  return months[month - 1];
-}
+int selectedMonth = DateTime.now().month;
+
+  get totalAmount => null;
 
   // Define service themes (icon, color, glow color)
   Map<String, dynamic> _getServiceTheme(String type) {
@@ -28,13 +24,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 'electricity':
         return {
           'icon': Icons.bolt_rounded,
-          'color': const Color(0xFFFF9F0A),
+          'color': const Color(0xFFFF9F0A), // Warm orange/amber
           'shadowColor': const Color(0xFFFF9F0A).withOpacity(0.25),
         };
       case 'hmwssb':
         return {
           'icon': Icons.water_drop_rounded,
-          'color': const Color(0xFF0A84FF),
+          'color': const Color(0xFF0A84FF), // Radiant blue
           'shadowColor': const Color(0xFF0A84FF).withOpacity(0.25),
         };
       case 'property_tax':
@@ -571,13 +567,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             return Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.06),
-
-                // color: const Color(0xFF1E1435),
+                color: const Color(0xFF1E1435),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.12),
-                  // color: const Color(0xFF2D1F49),
+                  color: const Color(0xFF2D1F49),
                   width: 1,
                 ),
               ),
@@ -640,103 +633,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildSummaryCard(DashboardState state) {
-  final now = DateTime.now();
-
-  // ✅ STRICT filter → only current month + year
-  final monthlyBills = state.utilityBills.where((b) =>
-      b['month'] == now.month &&
-      b['year'] == now.year).toList();
-
-  // ✅ Pending (ONLY this month)
-  final pendingBills =
-      monthlyBills.where((b) => !(b['isPaid'] ?? false)).length;
-
-  // ✅ Paid (ONLY this month)
-  final paidBills =
-      monthlyBills.where((b) => (b['isPaid'] ?? false)).length;
-
-  // ✅ Amount (ONLY pending this month)
-  final totalAmount = monthlyBills
-      .where((b) => !(b['isPaid'] ?? false))
-      .fold(0.0, (sum, item) => sum + (item['amount'] as double));
-
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Pending (${_getMonthName(now.month)})",
-                    style: const TextStyle(color: Color(0xFF8A9A9A), fontSize: 11),
-                  ),
-                  Text("$pendingBills",
-                      style: const TextStyle(
-                          color: Color(0xFFFF9F0A),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "Paid (${_getMonthName(now.month)})",
-                    style: const TextStyle(color: Color(0xFF8A9A9A), fontSize: 11),
-                  ),
-                  Text("$paidBills",
-                      style: const TextStyle(
-                          color: Color(0xFF30D158),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(height: 1, color: Colors.white.withOpacity(0.08)),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Pending Amount",
-                  style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-              Text("₹${totalAmount.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                      color: Color(0xFF19B9B9),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
   Widget _buildPayAllAtOnceCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
-          // color: const Color(0xFF1E1435),
+          color: const Color(0xFF1E1435),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: Colors.white.withOpacity(0.12),
-            // color: const Color(0xFF2D1F49),
+            color: const Color(0xFF2D1F49),
             width: 1,
           ),
         ),
@@ -875,6 +780,140 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+  String _getMonthName(int month) {
+  const months = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+  return months[month - 1];
+}
+
+  Widget _buildSummaryCard(DashboardState state) {
+  final monthlyBills = state.utilityBills
+      .where((b) => b['month'] == selectedMonth)
+      .toList();
+
+  final pendingBills =
+      monthlyBills.where((b) => !(b['isPaid'] ?? false)).length;
+
+  final paidBills =
+      monthlyBills.where((b) => (b['isPaid'] ?? false)).length;
+
+  final totalAmount = monthlyBills
+      .where((b) => !(b['isPaid'] ?? false))
+      .fold(0.0, (sum, item) => sum + (item['amount'] as double));
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Monthly Summary",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1435),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: DropdownButton<int>(
+                  value: selectedMonth,
+                  dropdownColor: const Color(0xFF1E1435),
+                  underline: const SizedBox(),
+                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  items: List.generate(12, (index) {
+                    final month = index + 1;
+                    return DropdownMenuItem(
+                      value: month,
+                      child: Text(_getMonthName(month)),
+                    );
+                  }),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedMonth = value!;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Pending",
+                      style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                  Text("$pendingBills",
+                      style: const TextStyle(
+                          color: Color(0xFFFF9F0A),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text("Paid",
+                      style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                  Text("$paidBills",
+                      style: const TextStyle(
+                          color: Color(0xFF30D158),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          Container(
+            height: 1,
+            color: Colors.white.withOpacity(0.08),
+          ),
+
+          const SizedBox(height: 12),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Pending Amount",
+                  style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+              Text("₹${totalAmount.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                      color: Color(0xFF19B9B9),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
 }
 
 class RibbonPainter extends CustomPainter {
