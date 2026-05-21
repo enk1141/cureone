@@ -37,10 +37,10 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     // Exact matching palette from login screen
-    const Color primaryTeal = Color(0xFF19B9B9);
-    const Color accentTeal = Color(0xFF24BDBD);
-    const Color darkText = Colors.white;
-    const Color lightBg = Color(0xFF0F0720);
+    const Color primaryTeal = Color(0xFF0653C7);
+    const Color accentTeal = Color(0xFF0653C7);
+    const Color darkText = Color(0xFF0653C7);
+    const Color lightBg = Colors.white;
 
     return Scaffold(
       backgroundColor: lightBg,
@@ -48,7 +48,7 @@ class _OtpScreenState extends State<OtpScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: darkText, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF0653C7), size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -84,10 +84,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         height: 90,
                         width: 90,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1435),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                              color: const Color(0xFF2D1F49), width: 1),
+                              color: const Color(0xFFE5E9F2), width: 1),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
@@ -113,7 +113,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: darkText),
+                            color: Color(0xFF0653C7)),
                       ),
                       const SizedBox(height: 8),
 
@@ -122,7 +122,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         "Enter the 6-digit code sent to\n+91 ${widget.mobileNumber}",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.grey.shade400,
+                            color: Colors.grey.shade600,
                             fontSize: 14,
                             height: 1.4),
                       ),
@@ -132,11 +132,11 @@ class _OtpScreenState extends State<OtpScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1435),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(28),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(.2),
+                              color: Colors.black.withOpacity(0.05),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
@@ -186,12 +186,12 @@ class _OtpScreenState extends State<OtpScreen> {
                                       decoration: InputDecoration(
                                         counterText: '',
                                         filled: true,
-                                        fillColor: const Color(0xFF281F3D),
+                                        fillColor: const Color(0xFFF4F6F9),
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           borderSide: BorderSide(
-                                              color: const Color(0xFF2D1F49),
+                                              color: const Color(0xFFE5E9F2),
                                               width: 1.5),
                                         ),
                                         focusedBorder: OutlineInputBorder(
@@ -222,7 +222,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               height: 52,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF24C5C5),
+                                  backgroundColor: const Color(0xFF0653C7),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16)),
                                   elevation: 0,
@@ -298,15 +298,15 @@ class _OtpScreenState extends State<OtpScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1435),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: const Color(0xFF2D1F49)),
+                          border: Border.all(color: const Color(0xFFE5E9F2)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.verified_user,
-                                color: Color(0xFF1DB9A9), size: 18),
+                                color: Color(0xFF0653C7), size: 18),
                             SizedBox(width: 8),
                             Flexible(
                               child: Text(
@@ -314,7 +314,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
-                                    color: Colors.white),
+                                    color: Color(0xFF0653C7)),
                               ),
                             ),
                           ],

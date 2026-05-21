@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
@@ -67,17 +67,7 @@ int selectedMonth = DateTime.now().month;
       create: (context) => DashboardBloc()..add(LoadBills()),
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF0F0720), // Deep violet-black
-                Color(0xFF160E2A), // Dark purple
-                Color(0xFF0F0720),
-              ],
-            ),
-          ),
+          color: const Color(0xFFFEFEFE),
           child: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -122,7 +112,7 @@ int selectedMonth = DateTime.now().month;
           Text(
             "Welcome",
             style: TextStyle(
-              color: Color(0xFF19B9B9),
+              color: Color(0xFF0956CB),
               fontSize: 20,
               fontWeight: FontWeight.w900,
               fontFamily: 'Inter',
@@ -145,12 +135,12 @@ int selectedMonth = DateTime.now().month;
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [Color(0xFF19B9B9), Color(0xFF24BDBD)],
+                colors: [Color(0xFF0956CB), Color(0xFF0653C7)],
               ),
             ),
             child: CircleAvatar(
               radius: 18,
-              backgroundColor: const Color(0xFF1E1435),
+              backgroundColor: Colors.white,
               child: ClipOval(
                 child: Image.asset(
                   "assets/logo.png",
@@ -173,7 +163,7 @@ int selectedMonth = DateTime.now().month;
                     Text(
                       "CURE ONE",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF0956CB),
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
@@ -182,7 +172,7 @@ int selectedMonth = DateTime.now().month;
                     SizedBox(width: 4),
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF19B9B9),
+                      color: Color(0xFF0956CB),
                       size: 16,
                     ),
                   ],
@@ -234,15 +224,15 @@ int selectedMonth = DateTime.now().month;
           height: 38,
           width: 38,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1435),
+            color: Colors.white,
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFF2D1F49),
+              color: const Color(0xFFE5E9F2),
               width: 1,
             ),
           ),
           child: IconButton(
-            icon: Icon(icon, color: Colors.white, size: 18),
+            icon: Icon(icon, color: const Color(0xFF0653C7), size: 18),
             onPressed: onPressed,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
@@ -354,8 +344,8 @@ int selectedMonth = DateTime.now().month;
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(3),
                     color: _currentBannerIndex == entry.key
-                        ? const Color(0xFF19B9B9)
-                        : const Color(0xFF19B9B9).withOpacity(0.3),
+                        ? const Color(0xFF0956CB)
+                        : const Color(0xFF0956CB).withOpacity(0.3),
                   ),
                 );
               }).toList(),
@@ -381,14 +371,14 @@ int selectedMonth = DateTime.now().month;
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            Color(0xFF1E1435),
+            Colors.white,
             Color(0xFF251A43),
-            Color(0xFF1E1435),
+            Colors.white,
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFF2D1F49),
+          color: const Color(0xFFE5E9F2),
           width: 1,
         ),
       ),
@@ -418,7 +408,7 @@ int selectedMonth = DateTime.now().month;
                           colors: [
                             Color(0x001E1435),
                             Color(0x801E1435),
-                            Color(0xFF1E1435),
+                            Colors.white,
                           ],
                           stops: [0.0, 0.5, 0.95],
                         ),
@@ -443,7 +433,7 @@ int selectedMonth = DateTime.now().month;
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                            color: const Color(0xFF0653C7),
                             height: 1.15,
                             letterSpacing: 0.1,
                           ),
@@ -453,7 +443,7 @@ int selectedMonth = DateTime.now().month;
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                            color: const Color(0xFF0653C7),
                             height: 1.15,
                             letterSpacing: 0.1,
                           ),
@@ -488,7 +478,7 @@ int selectedMonth = DateTime.now().month;
                             Text(
                               badgeHighlight,
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: const Color(0xFF0653C7),
                                 fontSize: 8,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -497,7 +487,7 @@ int selectedMonth = DateTime.now().month;
                             Text(
                               badgeRest,
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: const Color(0xFF0653C7),
                                 fontSize: 7,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -522,7 +512,7 @@ int selectedMonth = DateTime.now().month;
       child: Text(
         "Utility Services",
         style: TextStyle(
-          color: Colors.white,
+          color: Color(0xFF0956CB),
           fontSize: 16,
           fontWeight: FontWeight.w800,
         ),
@@ -538,7 +528,7 @@ int selectedMonth = DateTime.now().month;
             child: Padding(
               padding: EdgeInsets.all(40),
               child: CircularProgressIndicator(
-                color: Color(0xFF19B9B9),
+                color: Color(0xFF0956CB),
               ),
             ),
           );
@@ -567,10 +557,10 @@ int selectedMonth = DateTime.now().month;
 
             return Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1435),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF2D1F49),
+                  color: const Color(0xFFE5E9F2),
                   width: 1,
                 ),
               ),
@@ -615,7 +605,7 @@ int selectedMonth = DateTime.now().month;
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: const Color(0xFF0653C7),
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
                             height: 1.2,
@@ -638,10 +628,10 @@ int selectedMonth = DateTime.now().month;
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1435),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: const Color(0xFF2D1F49),
+            color: const Color(0xFFE5E9F2),
             width: 1,
           ),
         ),
@@ -664,12 +654,12 @@ int selectedMonth = DateTime.now().month;
                     height: 46,
                     width: 46,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF19B9B9).withOpacity(0.12),
+                      color: const Color(0xFF0956CB).withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.payments_rounded,
-                      color: Color(0xFF19B9B9),
+                      color: const Color(0xFF0653C7),
                       size: 22,
                     ),
                   ),
@@ -681,7 +671,7 @@ int selectedMonth = DateTime.now().month;
                         Text(
                           "Pay all at once",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: const Color(0xFF0653C7),
                             fontSize: 14,
                             fontWeight: FontWeight.w800,
                           ),
@@ -702,11 +692,11 @@ int selectedMonth = DateTime.now().month;
                     height: 36,
                     width: 36,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF19B9B9),
+                      color: const Color(0xFF0956CB),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF19B9B9).withOpacity(0.3),
+                          color: const Color(0xFF0956CB).withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -714,7 +704,7 @@ int selectedMonth = DateTime.now().month;
                     ),
                     child: const Icon(
                       Icons.arrow_forward_rounded,
-                      color: Colors.white,
+                      color: const Color(0xFF0653C7),
                       size: 18,
                     ),
                   ),
@@ -757,7 +747,7 @@ int selectedMonth = DateTime.now().month;
                   Text(
                     "CENTRE FOR GOOD GOVERNANCE",
                     style: TextStyle(
-                      color: Color(0xFF19B9B9),
+                      color: Color(0xFF0956CB),
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.2,
@@ -765,7 +755,7 @@ int selectedMonth = DateTime.now().month;
                   ),
                   SizedBox(height: 2),
                   Text(
-                    "Knowledge • Technology • People",
+                    "Knowledge â€¢ Technology â€¢ People",
                     style: TextStyle(
                       color: Color(0xFF8A9A9A),
                       fontSize: 8,
@@ -809,9 +799,9 @@ int selectedMonth = DateTime.now().month;
     child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Color(0xFF0956CB).withOpacity(0.06),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Color(0xFF0956CB).withOpacity(0.1)),
       ),
       child: Column(
         children: [
@@ -821,7 +811,7 @@ int selectedMonth = DateTime.now().month;
               const Text(
                 "Monthly Summary",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF0956CB),
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
@@ -830,15 +820,15 @@ int selectedMonth = DateTime.now().month;
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1435),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: DropdownButton<int>(
                   value: selectedMonth,
-                  dropdownColor: const Color(0xFF1E1435),
+                  dropdownColor: Colors.white,
                   underline: const SizedBox(),
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  icon: const Icon(Icons.keyboard_arrow_down, color: const Color(0xFF0653C7)),
+                  style: const TextStyle(color: const Color(0xFF0653C7), fontSize: 12),
                   items: List.generate(12, (index) {
                     final month = index + 1;
                     return DropdownMenuItem(
@@ -892,7 +882,7 @@ int selectedMonth = DateTime.now().month;
 
           Container(
             height: 1,
-            color: Colors.white.withOpacity(0.08),
+            color: Color(0xFF0956CB).withOpacity(0.08),
           ),
 
           const SizedBox(height: 12),
@@ -902,9 +892,9 @@ int selectedMonth = DateTime.now().month;
             children: [
               const Text("Pending Amount",
                   style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-              Text("₹${totalAmount.toStringAsFixed(2)}",
+              Text("Ã¢â€šÂ¹${totalAmount.toStringAsFixed(2)}",
                   style: const TextStyle(
-                      color: Color(0xFF19B9B9),
+                      color: Color(0xFF0956CB),
                       fontSize: 16,
                       fontWeight: FontWeight.bold)),
             ],
@@ -934,7 +924,7 @@ class RibbonPainter extends CustomPainter {
 
     // Draw dashed inner border
     final dashPaint = Paint()
-      ..color = Colors.white.withOpacity(0.6)
+      ..color = Color(0xFF0956CB).withOpacity(0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -967,3 +957,5 @@ class RibbonPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+

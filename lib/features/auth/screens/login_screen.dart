@@ -44,10 +44,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // Custom Color Palette
-    const Color primaryTeal = Color(0xFF19B9B9); //
-    const Color accentTeal = Color(0xFF24BDBD); //
-    const Color darkText = Colors.white; //
-    const Color lightBg = Color(0xFF0F0720); //
+    const Color primaryTeal = Color(0xFF0653C7); //
+    const Color accentTeal = Color(0xFF0653C7); //
+    const Color darkText = Color(0xFF0653C7); //
+    const Color lightBg = Colors.white; //
 
     return Scaffold(
       backgroundColor: lightBg, //
@@ -91,10 +91,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 90, //
                       width: 90, //
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1435), //
+                        color: Colors.white, //
                         borderRadius: BorderRadius.circular(24), //
                         border: Border.all(
-                          color: const Color(0xFF2D1F49), //
+                          color: const Color(0xFFE5E9F2), //
                           width: 1, //
                         ),
                       ),
@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 20, //
                         fontWeight: FontWeight.w700, //
-                        color: darkText, //
+                        color: Color(0xFF0653C7), //
                       ),
                     ),
                     const SizedBox(height: 8), //
@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       "Sign in with your mobile number to continue", //
                       textAlign: TextAlign.center, //
                       style: TextStyle(
-                        color: Colors.grey.shade400, //
+                        color: Colors.grey.shade600, //
                         fontSize: 14, //
                         fontWeight: FontWeight.w400, //
                       ),
@@ -145,11 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(20), //
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1435), //
+                        color: Colors.white, //
                         borderRadius: BorderRadius.circular(28), //
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(.2), //
+                            color: Colors.black.withOpacity(0.05), //
                             blurRadius: 20, //
                             offset: const Offset(0, 8), //
                           ),
@@ -177,21 +177,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                   vertical: 5, //
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF281F3D), //
+                                  color: const Color(0xFFF4F6F9), //
                                   borderRadius: BorderRadius.circular(12), //
                                 ),
                                 child: const Row(
                                   children: [
                                     Icon(
                                       Icons.lock, //
-                                      color: Color(0xFF28BFAF), //
+                                      color: Color(0xFF0653C7), //
                                       size: 13, //
                                     ),
                                     SizedBox(width: 4), //
                                     Text(
                                       "Secure", //
                                       style: TextStyle(
-                                        color: Color(0xFF28BFAF), //
+                                        color: Color(0xFF0653C7), //
                                         fontWeight: FontWeight.w600, //
                                         fontSize: 12, //
                                       ),
@@ -224,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12), //
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF281F3D), //
+                                    color: const Color(0xFFF4F6F9), //
                                     borderRadius: BorderRadius.circular(12), //
                                   ),
                                   child: const Row(
@@ -238,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         "+91", //
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700, //
-                                          color: accentTeal, //
+                                          color: Color(0xFF0653C7), //
                                           fontSize: 15, //
                                         ),
                                       ),
@@ -311,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 52, //
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF24C5C5), //
+                                backgroundColor: const Color(0xFF0653C7), //
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16), //
                                 ),
@@ -385,10 +385,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 10, //
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1435), //
+                        color: Colors.white, //
                         borderRadius: BorderRadius.circular(30), //
                         border: Border.all(
-                          color: const Color(0xFF2D1F49), //
+                          color: const Color(0xFFE5E9F2), //
                         ),
                       ),
                       child: const Row(
@@ -396,7 +396,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Icon(
                             Icons.verified_user, //
-                            color: Color(0xFF1DB9A9), //
+                            color: Color(0xFF0653C7), //
                             size: 18, //
                           ),
                           SizedBox(width: 8), //
@@ -407,7 +407,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.w600, //
                                 fontSize: 12, //
-                                color: Colors.white, //
+                                color: Color(0xFF0653C7), //
                               ),
                             ),
                           ),

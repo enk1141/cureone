@@ -50,12 +50,12 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryTeal = Color(0xFF19B9B9);
-    const Color accentTeal = Color(0xFF24BDBD);
-    const Color darkText = Color(0xFF0B0B22);
+    const Color primaryTeal = Color(0xFF0653C7);
+    const Color accentTeal = Color(0xFF0653C7);
+    const Color darkText = Color(0xFF0653C7);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F9F9),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -223,7 +223,7 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
                             height: 52,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF24C5C5),
+                                backgroundColor: const Color(0xFF0653C7),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
