@@ -53,7 +53,7 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
           backgroundColor: const Color(0xFF1E1435),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: const Color(0xFF2D1F49), width: 1.5),
+            side: const BorderSide(color: Color(0xFF2D1F49), width: 1.5),
           ),
           title: Row(
             children: [
@@ -92,8 +92,8 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
                       labelText: "Utility Account/Consumer ID",
                       labelStyle: const TextStyle(
                           color: Color(0xFF8A9A9A), fontSize: 13),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF2D1F49)),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF2D1F49)),
                       ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: accentColor),
@@ -112,8 +112,8 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
                       labelText: "Consumer Name",
                       labelStyle: const TextStyle(
                           color: Color(0xFF8A9A9A), fontSize: 13),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF2D1F49)),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF2D1F49)),
                       ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: accentColor),
@@ -133,8 +133,8 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
                       labelText: "Due Amount (₹)",
                       labelStyle: const TextStyle(
                           color: Color(0xFF8A9A9A), fontSize: 13),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF2D1F49)),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF2D1F49)),
                       ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: accentColor),
@@ -142,8 +142,9 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
                     ),
                     validator: (val) {
                       if (val == null || val.isEmpty) return "Required";
-                      if (double.tryParse(val) == null)
+                      if (double.tryParse(val) == null) {
                         return "Enter valid number";
+                      }
                       return null;
                     },
                   ),
@@ -336,13 +337,13 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
                                   thickness: 1),
                               // Bills List
                               if (catBills.isEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(
                                       vertical: 20, horizontal: 16),
                                   child: Center(
                                     child: Text(
                                       "No active bills. Click '+' to add one.",
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: Color(0xFF8A9A9A),
                                         fontSize: 11,
                                         fontStyle: FontStyle.italic,
@@ -531,12 +532,12 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1435),
-        border: const Border(
+      decoration: const BoxDecoration(
+        color: Color(0xFF1E1435),
+        border: Border(
           top: BorderSide(color: Color(0xFF2D1F49), width: 1.5),
         ),
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),

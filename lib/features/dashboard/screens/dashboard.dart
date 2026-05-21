@@ -14,7 +14,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentBannerIndex = 0;
 
-int selectedMonth = DateTime.now().month;
+  int selectedMonth = DateTime.now().month;
 
   get totalAmount => null;
 
@@ -81,13 +81,13 @@ int selectedMonth = DateTime.now().month;
                   const SizedBox(height: 12),
                   _buildBannerCarousel(),
                   const SizedBox(height: 18),
+                  _buildPayAllAtOnceCard(),
+                  const SizedBox(height: 14),
                   BlocBuilder<DashboardBloc, DashboardState>(
                     builder: (context, state) {
                       return _buildSummaryCard(state);
                     },
                   ),
-                  const SizedBox(height: 14),
-                  _buildPayAllAtOnceCard(),
                   const SizedBox(height: 14),
                   _buildAllServicesHeader(),
                   _buildServicesGrid(),
@@ -478,7 +478,7 @@ int selectedMonth = DateTime.now().month;
                             Text(
                               badgeHighlight,
                               style: const TextStyle(
-                                color: const Color(0xFF0653C7),
+                                color: Colors.white,
                                 fontSize: 8,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -487,7 +487,7 @@ int selectedMonth = DateTime.now().month;
                             Text(
                               badgeRest,
                               style: const TextStyle(
-                                color: const Color(0xFF0653C7),
+                                color: Colors.white,
                                 fontSize: 7,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -540,9 +540,9 @@ int selectedMonth = DateTime.now().month;
           padding:
               const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
             childAspectRatio: 0.88,
           ),
           itemCount: state.bills.length,
@@ -552,8 +552,8 @@ int selectedMonth = DateTime.now().month;
             final type = bill['type'] as String;
             final theme = _getServiceTheme(type);
 
-            final IconData iconData = theme['icon'] as IconData;
-            final Color accentColor = theme['color'] as Color;
+            final IconData iconData = theme['icon'];
+            final Color accentColor = theme['color'];
 
             return Container(
               decoration: BoxDecoration(
@@ -579,37 +579,68 @@ int selectedMonth = DateTime.now().month;
                     );
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(14),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Icon circle with subtle glow background
-                        Container(
-                          height: 38,
-                          width: 38,
-                          decoration: BoxDecoration(
-                            color: accentColor.withOpacity(0.12),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            iconData,
-                            color: accentColor,
-                            size: 20,
-                          ),
+                        // 🔷 TOP SECTION (Icon + Title)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 42,
+                              width: 42,
+                              decoration: BoxDecoration(
+                                color: accentColor.withOpacity(0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                iconData,
+                                color: accentColor,
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF0653C7),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 10),
-                        // Service Title
-                        Text(
-                          title,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: const Color(0xFF0653C7),
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            height: 1.2,
-                          ),
+
+                        // 🔷 BOTTOM SECTION (Amount + Arrow)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "₹${(bill['amount'] ?? 0).toString()}",
+                              style: TextStyle(
+                                color: accentColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Container(
+                              height: 32,
+                              width: 32,
+                              decoration: BoxDecoration(
+                                color: accentColor.withOpacity(0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 14,
+                                color: accentColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -704,7 +735,7 @@ int selectedMonth = DateTime.now().month;
                     ),
                     child: const Icon(
                       Icons.arrow_forward_rounded,
-                      color: const Color(0xFF0653C7),
+                      color: Colors.white,
                       size: 18,
                     ),
                   ),
@@ -772,138 +803,143 @@ int selectedMonth = DateTime.now().month;
   }
 
   String _getMonthName(int month) {
-  const months = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-  ];
-  return months[month - 1];
-}
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
+    return months[month - 1];
+  }
 
   Widget _buildSummaryCard(DashboardState state) {
-  final monthlyBills = state.utilityBills
-      .where((b) => b['month'] == selectedMonth)
-      .toList();
+    final monthlyBills =
+        state.utilityBills.where((b) => b['month'] == selectedMonth).toList();
 
-  final pendingBills =
-      monthlyBills.where((b) => !(b['isPaid'] ?? false)).length;
+    final pendingBills =
+        monthlyBills.where((b) => !(b['isPaid'] ?? false)).length;
 
-  final paidBills =
-      monthlyBills.where((b) => (b['isPaid'] ?? false)).length;
+    final paidBills = monthlyBills.where((b) => (b['isPaid'] ?? false)).length;
 
-  final totalAmount = monthlyBills
-      .where((b) => !(b['isPaid'] ?? false))
-      .fold(0.0, (sum, item) => sum + (item['amount'] as double));
+    final totalAmount = monthlyBills
+        .where((b) => !(b['isPaid'] ?? false))
+        .fold(0.0, (sum, item) => sum + (item['amount'] as double));
 
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Color(0xFF0956CB).withOpacity(0.06),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Color(0xFF0956CB).withOpacity(0.1)),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Color(0xFF0956CB).withOpacity(0.06),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Color(0xFF0956CB).withOpacity(0.1)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Monthly Summary",
+                  style: TextStyle(
+                    color: Color(0xFF0956CB),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: DropdownButton<int>(
+                    value: selectedMonth,
+                    dropdownColor: Colors.white,
+                    underline: const SizedBox(),
+                    icon: const Icon(Icons.keyboard_arrow_down,
+                        color: const Color(0xFF0653C7)),
+                    style: const TextStyle(
+                        color: const Color(0xFF0653C7), fontSize: 12),
+                    items: List.generate(12, (index) {
+                      final month = index + 1;
+                      return DropdownMenuItem(
+                        value: month,
+                        child: Text(_getMonthName(month)),
+                      );
+                    }),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedMonth = value!;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(" Pending",
+                        style:
+                            TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                    Text("$pendingBills",
+                        style: const TextStyle(
+                            color: Color(0xFFFF9F0A),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text("Paid",
+                        style:
+                            TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                    Text("$paidBills",
+                        style: const TextStyle(
+                            color: Color(0xFF30D158),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Container(
+              height: 1,
+              color: Color(0xFF0956CB).withOpacity(0.08),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Pending Amount",
+                    style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
+                Text("₹${totalAmount.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                        color: Color(0xFF0956CB),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ],
+        ),
       ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Monthly Summary",
-                style: TextStyle(
-                  color: Color(0xFF0956CB),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: DropdownButton<int>(
-                  value: selectedMonth,
-                  dropdownColor: Colors.white,
-                  underline: const SizedBox(),
-                  icon: const Icon(Icons.keyboard_arrow_down, color: const Color(0xFF0653C7)),
-                  style: const TextStyle(color: const Color(0xFF0653C7), fontSize: 12),
-                  items: List.generate(12, (index) {
-                    final month = index + 1;
-                    return DropdownMenuItem(
-                      value: month,
-                      child: Text(_getMonthName(month)),
-                    );
-                  }),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedMonth = value!;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 14),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Pending",
-                      style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-                  Text("$pendingBills",
-                      style: const TextStyle(
-                          color: Color(0xFFFF9F0A),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text("Paid",
-                      style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-                  Text("$paidBills",
-                      style: const TextStyle(
-                          color: Color(0xFF30D158),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          Container(
-            height: 1,
-            color: Color(0xFF0956CB).withOpacity(0.08),
-          ),
-
-          const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Pending Amount",
-                  style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-              Text("Ã¢â€šÂ¹${totalAmount.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                      color: Color(0xFF0956CB),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 }
 
 class RibbonPainter extends CustomPainter {
@@ -957,5 +993,3 @@ class RibbonPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
-

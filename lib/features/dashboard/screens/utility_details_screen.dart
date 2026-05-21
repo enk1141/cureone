@@ -44,7 +44,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
     },
   };
 
-  void _showAddUtilityDialog(BuildContext context, Color accentColor, String title) {
+  void _showAddUtilityDialog(
+      BuildContext context, Color accentColor, String title) {
     final formKey = GlobalKey<FormState>();
     final idController = TextEditingController();
     final nameController = TextEditingController();
@@ -75,13 +76,16 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                   color: accentColor.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(_categoryDetails[widget.category]['icon'] as IconData, color: accentColor, size: 20),
+                child: Icon(
+                    _categoryDetails[widget.category]['icon'] as IconData,
+                    color: accentColor,
+                    size: 20),
               ),
               const SizedBox(width: 10),
-              Expanded(
+              const Expanded(
                 child: Text(
                   "Add New Bill",
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -101,7 +105,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: "Consumer / Connection ID",
-                      labelStyle: const TextStyle(color: Color(0xFF8A9A9A), fontSize: 13),
+                      labelStyle: const TextStyle(
+                          color: Color(0xFF8A9A9A), fontSize: 13),
                       enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Color(0xFF2D1F49)),
                       ),
@@ -120,7 +125,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: "Consumer Name",
-                      labelStyle: const TextStyle(color: Color(0xFF8A9A9A), fontSize: 13),
+                      labelStyle: const TextStyle(
+                          color: Color(0xFF8A9A9A), fontSize: 13),
                       enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Color(0xFF2D1F49)),
                       ),
@@ -140,7 +146,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: "Due Amount (₹)",
-                      labelStyle: const TextStyle(color: Color(0xFF8A9A9A), fontSize: 13),
+                      labelStyle: const TextStyle(
+                          color: Color(0xFF8A9A9A), fontSize: 13),
                       enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Color(0xFF2D1F49)),
                       ),
@@ -150,7 +157,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                     ),
                     validator: (val) {
                       if (val == null || val.isEmpty) return "Required";
-                      if (double.tryParse(val) == null) return "Enter valid number";
+                      if (double.tryParse(val) == null)
+                        return "Enter valid number";
                       return null;
                     },
                   ),
@@ -158,17 +166,21 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
               ),
             ),
           ),
-          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          actionsPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("CANCEL", style: TextStyle(color: Color(0xFF8A9A9A))),
+              child: const Text("CANCEL",
+                  style: TextStyle(color: Color(0xFF8A9A9A))),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: accentColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
               onPressed: () {
                 if (formKey.currentState!.validate()) {
@@ -184,7 +196,9 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                   Navigator.pop(dialogContext);
                 }
               },
-              child: const Text("ADD", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text("ADD",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -194,11 +208,12 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final catData = _categoryDetails[widget.category] ?? {
-      'title': 'Utility Bills',
-      'icon': Icons.receipt_rounded,
-      'color': const Color(0xFF19B9B9),
-    };
+    final catData = _categoryDetails[widget.category] ??
+        {
+          'title': 'Utility Bills',
+          'icon': Icons.receipt_rounded,
+          'color': const Color(0xFF19B9B9),
+        };
     final String catTitle = catData['title'] as String;
     final IconData catIcon = catData['icon'] as IconData;
     final Color catColor = catData['color'] as Color;
@@ -206,27 +221,34 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
     return BlocBuilder<DashboardBloc, DashboardState>(
       builder: (context, state) {
         // Filter bills of this category
-        final catBills = state.utilityBills.where((b) => b['category'] == widget.category).toList();
-        final selectedBills = catBills.where((b) => b['isSelected'] as bool).toList();
+        final catBills = state.utilityBills
+            .where((b) => b['category'] == widget.category)
+            .toList();
+        final selectedBills =
+            catBills.where((b) => b['isSelected'] as bool).toList();
         final int totalCount = selectedBills.length;
-        final double totalAmount = selectedBills.fold(0.0, (sum, item) => sum + (item['amount'] as double));
+        final double totalAmount = selectedBills.fold(
+            0.0, (sum, item) => sum + (item['amount'] as double));
 
         // Check if all bills are selected
-        final bool allSelected = catBills.isNotEmpty && catBills.every((b) => b['isSelected'] as bool);
+        final bool allSelected = catBills.isNotEmpty &&
+            catBills.every((b) => b['isSelected'] as bool);
 
         return Scaffold(
           floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 80),
-          child: FloatingActionButton(
-            backgroundColor: catColor,
-            elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            onPressed: () => _showAddUtilityDialog(context, catColor, catTitle),
-            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
-          ),
+            padding: const EdgeInsets.only(bottom: 80),
+            child: FloatingActionButton(
+              backgroundColor: catColor,
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              onPressed: () =>
+                  _showAddUtilityDialog(context, catColor, catTitle),
+              child:
+                  const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+            ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
           body: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -242,7 +264,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
             child: SafeArea(
               child: Column(
                 children: [
-                  _buildHeader(context, catTitle, catColor, catIcon, allSelected, catBills.isNotEmpty),
+                  _buildHeader(context, catTitle, catColor, catIcon,
+                      allSelected, catBills.isNotEmpty),
                   Expanded(
                     child: catBills.isEmpty
                         ? _buildEmptyState(catColor)
@@ -257,7 +280,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                               final billName = bill['name'] as String;
                               final billId = bill['id'] as String;
                               final dueDate = bill['dueDate'] as String;
-                              final isExpired = dueDate.toLowerCase() == 'expired';
+                              final isExpired =
+                                  dueDate.toLowerCase() == 'expired';
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -265,7 +289,9 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                                   color: const Color(0xFF1E1435),
                                   borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
-                                    color: isSelected ? catColor.withOpacity(0.5) : const Color(0xFF2D1F49),
+                                    color: isSelected
+                                        ? catColor.withOpacity(0.5)
+                                        : const Color(0xFF2D1F49),
                                     width: 1.2,
                                   ),
                                   boxShadow: isSelected
@@ -297,11 +323,15 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                                             activeColor: catColor,
                                             checkColor: Colors.black,
                                             side: BorderSide(
-                                              color: isSelected ? catColor : const Color(0xFF4C3E6D),
+                                              color: isSelected
+                                                  ? catColor
+                                                  : const Color(0xFF4C3E6D),
                                               width: 1.5,
                                             ),
                                             onChanged: (val) {
-                                              BlocProvider.of<DashboardBloc>(context).add(
+                                              BlocProvider.of<DashboardBloc>(
+                                                      context)
+                                                  .add(
                                                 ToggleBillSelection(id: billId),
                                               );
                                             },
@@ -310,7 +340,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 billName,
@@ -335,9 +366,14 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                                                 style: TextStyle(
                                                   color: isExpired
                                                       ? const Color(0xFFFF453A)
-                                                      : (dueDate.contains('5 days') || dueDate.contains('2 days')
-                                                          ? const Color(0xFFFF9F0A)
-                                                          : const Color(0xFF30D158)),
+                                                      : (dueDate.contains(
+                                                                  '5 days') ||
+                                                              dueDate.contains(
+                                                                  '2 days')
+                                                          ? const Color(
+                                                              0xFFFF9F0A)
+                                                          : const Color(
+                                                              0xFF30D158)),
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -362,7 +398,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                             },
                           ),
                   ),
-                  _buildBottomNavBar(context, totalCount, totalAmount, selectedBills),
+                  _buildBottomNavBar(
+                      context, totalCount, totalAmount, selectedBills),
                 ],
               ),
             ),
@@ -385,7 +422,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                color: Colors.white, size: 18),
             onPressed: () => Navigator.pop(context),
             splashRadius: 20,
           ),
@@ -430,7 +468,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                     value: allSelected,
                     activeColor: catColor,
                     checkColor: Colors.black,
-                    side: const BorderSide(color: Color(0xFF4C3E6D), width: 1.5),
+                    side:
+                        const BorderSide(color: Color(0xFF4C3E6D), width: 1.5),
                     onChanged: (val) {
                       BlocProvider.of<DashboardBloc>(context).add(
                         ToggleCategoryBillsSelection(
@@ -460,7 +499,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
               color: catColor.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.receipt_rounded, color: catColor.withOpacity(0.6), size: 36),
+            child: Icon(Icons.receipt_rounded,
+                color: catColor.withOpacity(0.6), size: 36),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -485,7 +525,8 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
     );
   }
 
-  Widget _buildBottomNavBar(BuildContext context, int totalCount, double totalAmount, List<Map<String, dynamic>> selectedBills) {
+  Widget _buildBottomNavBar(BuildContext context, int totalCount,
+      double totalAmount, List<Map<String, dynamic>> selectedBills) {
     final bool hasSelection = totalCount > 0;
 
     return Container(
@@ -555,7 +596,9 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                 Text(
                   "Pay Now",
                   style: TextStyle(
-                    color: hasSelection ? Colors.white : Colors.white.withOpacity(0.4),
+                    color: hasSelection
+                        ? Colors.white
+                        : Colors.white.withOpacity(0.4),
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
                   ),
@@ -563,7 +606,9 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                 const SizedBox(width: 8),
                 Icon(
                   Icons.arrow_forward_rounded,
-                  color: hasSelection ? Colors.white : Colors.white.withOpacity(0.4),
+                  color: hasSelection
+                      ? Colors.white
+                      : Colors.white.withOpacity(0.4),
                   size: 16,
                 ),
               ],

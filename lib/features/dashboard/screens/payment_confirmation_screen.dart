@@ -462,9 +462,9 @@ class PaymentConfirmationScreen extends StatelessWidget {
             shadowColor: const Color(0xFF19B9B9).withOpacity(0.3),
           ),
           onPressed: () => _showSuccessDialog(context, grandTotal),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Icon(Icons.lock_outline_rounded, color: Colors.white, size: 16),
               SizedBox(width: 8),
               Text(
