@@ -4,6 +4,7 @@ part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginInitial()) {
+    on<MobileNumberChanged>((event, emit) {});
     on<LoginSubmitted>((event, emit) async {
       emit(LoginLoading());
 
@@ -17,7 +18,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         bool isExistingUser = (event.mobileNumber == "9999999999");
 
         if (isExistingUser) {
-          emit(LoginExistingUserSuccess()); // Bypasses OTP flow -> Enter MPIN Screen
+          emit(
+              LoginExistingUserSuccess()); // Bypasses OTP flow -> Enter MPIN Screen
         } else {
           emit(LoginOtpSent()); // Standard registration pipeline -> OTP Screen
         }
