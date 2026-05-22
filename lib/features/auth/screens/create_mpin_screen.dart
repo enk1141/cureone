@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
 import 'package:my_cure_ui/config/routes.dart';
+import 'package:my_cure_ui/main.dart';
 
 class CreateMpinScreen extends StatefulWidget {
   const CreateMpinScreen({super.key});
@@ -11,7 +12,7 @@ class CreateMpinScreen extends StatefulWidget {
   State<CreateMpinScreen> createState() => _CreateMpinScreenState();
 }
 
-class _CreateMpinScreenState extends State<CreateMpinScreen> {
+class _CreateMpinScreenState extends State<CreateMpinScreen> with RouteAware {
   // 4 Controllers & FocusNodes for the first MPIN row
   final List<TextEditingController> _mpinControllers =
       List.generate(4, (_) => TextEditingController());
@@ -24,7 +25,34 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
       List.generate(4, (_) => FocusNode());
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) appRouteObserver.subscribe(this, route);
+  }
+
+  @override
+  void didPopNext() {
+    // Returned from validate-MPIN — reset both rows so the user can re-enter.
+    _clearAll();
+  }
+
+  void _clearAll() {
+    for (final c in _mpinControllers) {
+      c.clear();
+    }
+    for (final c in _confirmControllers) {
+      c.clear();
+    }
+    if (mounted) {
+      setState(() {});
+      _mpinFocusNodes[0].requestFocus();
+    }
+  }
+
+  @override
   void dispose() {
+    appRouteObserver.unsubscribe(this);
     for (var c in _mpinControllers) {
       c.dispose();
     }

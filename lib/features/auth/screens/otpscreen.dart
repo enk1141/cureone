@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/auth/bloc/otp/otp_block.dart';
 import 'package:my_cure_ui/config/routes.dart';
+import 'package:my_cure_ui/main.dart';
 
 class OtpScreen extends StatefulWidget {
   final String mobileNumber;
@@ -13,14 +14,37 @@ class OtpScreen extends StatefulWidget {
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends State<OtpScreen> with RouteAware {
   // 6 separate controllers for individual box capture
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) appRouteObserver.subscribe(this, route);
+  }
+
+  @override
+  void didPopNext() {
+    _clearAll();
+  }
+
+  void _clearAll() {
+    for (final c in _controllers) {
+      c.clear();
+    }
+    if (mounted) {
+      setState(() {});
+      _focusNodes[0].requestFocus();
+    }
+  }
+
+  @override
   void dispose() {
+    appRouteObserver.unsubscribe(this);
     for (var controller in _controllers) {
       controller.dispose();
     }
@@ -190,8 +214,8 @@ class _OtpScreenState extends State<OtpScreen> {
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
-                                          borderSide: BorderSide(
-                                              color: const Color(0xFFE5E9F2),
+                                          borderSide: const BorderSide(
+                                              color: Color(0xFFE5E9F2),
                                               width: 1.5),
                                         ),
                                         focusedBorder: OutlineInputBorder(

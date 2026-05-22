@@ -79,5 +79,17 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       }).toList();
       emit(state.copyWith(utilityBills: updatedList));
     });
+
+    on<MarkBillPaid>((event, emit) {
+      final updatedList = state.utilityBills.map((bill) {
+        if (bill['id'] == event.id) {
+          return Map<String, dynamic>.from(bill)
+            ..['isPaid'] = true
+            ..['isSelected'] = false;
+        }
+        return bill;
+      }).toList();
+      emit(state.copyWith(utilityBills: updatedList));
+    });
   }
 }

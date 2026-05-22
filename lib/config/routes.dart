@@ -7,22 +7,33 @@ import 'package:my_cure_ui/features/auth/screens/login_screen.dart';
 import 'package:my_cure_ui/features/auth/screens/otpscreen.dart';
 import 'package:my_cure_ui/features/auth/screens/create_mpin_screen.dart';
 import 'package:my_cure_ui/features/auth/screens/enter_mpin_screen.dart';
-import 'package:my_cure_ui/features/dashboard/screens/dashboard.dart';
+import 'package:my_cure_ui/features/auth/screens/validate_mpin_screen.dart';
+import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:my_cure_ui/features/dashboard/screens/utility_details_screen.dart';
 import 'package:my_cure_ui/features/dashboard/screens/pay_all_at_once_screen.dart';
-import 'package:my_cure_ui/features/dashboard/screens/payment_confirmation_screen.dart';
-import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
+import 'package:my_cure_ui/features/shell/main_shell.dart';
+import 'package:my_cure_ui/features/utilities/screens/my_utilities_screen.dart';
+import 'package:my_cure_ui/features/utilities/screens/register_utility_screen.dart';
+import 'package:my_cure_ui/features/payment/screens/payment_gateway_screen.dart';
+import 'package:my_cure_ui/features/payment/screens/payment_success_screen.dart';
+import 'package:my_cure_ui/features/payment/screens/payment_history_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
   static const String otp = '/otp';
   static const String createMpin = '/create-mpin';
   static const String enterMpin = '/enter-mpin';
-  static const String dashboard = '/dashboard';
+  static const String validateMpin = '/validate-mpin';
+  static const String home = '/home';
+  // Kept for backward compat — old callers that navigate to dashboard land on the shell.
+  static const String dashboard = home;
   static const String utilityDetails = '/utility-details';
   static const String payAllAtOnce = '/pay-all-at-once';
-  static const String paymentConfirmation = '/payment-confirmation';
-static String get validateMpin => enterMpin;
+  static const String myUtilities = '/my-utilities';
+  static const String registerUtility = '/register-utility';
+  static const String paymentGateway = '/payment-gateway';
+  static const String paymentSuccess = '/payment-success';
+  static const String paymentHistory = '/payment-history';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -64,11 +75,21 @@ static String get validateMpin => enterMpin;
           settings: settings,
         );
 
-      case dashboard:
+      case validateMpin:
+        final mpin = settings.arguments as String;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => DashboardBloc(),
-            child: const DashboardScreen(),
+            create: (_) => MpinBloc(),
+            child: ValidateMpinScreen(mpin: mpin),
+          ),
+          settings: settings,
+        );
+
+      case home:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => DashboardBloc()..add(LoadBills()),
+            child: const MainShell(),
           ),
           settings: settings,
         );
@@ -95,15 +116,53 @@ static String get validateMpin => enterMpin;
           settings: settings,
         );
 
-      case paymentConfirmation:
+      case myUtilities:
+        final bloc = settings.arguments as DashboardBloc;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: bloc,
+            child: const MyUtilitiesScreen(),
+          ),
+          settings: settings,
+        );
+
+      case registerUtility:
+        final bloc = settings.arguments as DashboardBloc;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: bloc,
+            child: const RegisterUtilityScreen(),
+          ),
+          settings: settings,
+        );
+
+      case paymentGateway:
         final args = settings.arguments as Map<String, dynamic>;
-        final selectedBills = args['selectedBills'] as List<Map<String, dynamic>>;
+        final selectedBills =
+            args['selectedBills'] as List<Map<String, dynamic>>;
         final bloc = args['bloc'] as DashboardBloc;
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
             value: bloc,
-            child: PaymentConfirmationScreen(selectedBills: selectedBills),
+            child: PaymentGatewayScreen(selectedBills: selectedBills),
           ),
+          settings: settings,
+        );
+
+      case paymentSuccess:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => PaymentSuccessScreen(
+            paidBills: args['paidBills'] as List<Map<String, dynamic>>,
+            paymentMethod: args['paymentMethod'] as String,
+            transactionId: args['transactionId'] as String,
+          ),
+          settings: settings,
+        );
+
+      case paymentHistory:
+        return MaterialPageRoute(
+          builder: (_) => const PaymentHistoryScreen(),
           settings: settings,
         );
 

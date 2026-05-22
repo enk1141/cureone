@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
 import 'package:my_cure_ui/config/routes.dart';
+import 'package:my_cure_ui/main.dart';
 
 class ValidateMpinScreen extends StatefulWidget {
   final String mpin;
@@ -13,13 +14,27 @@ class ValidateMpinScreen extends StatefulWidget {
   State<ValidateMpinScreen> createState() => _ValidateMpinScreenState();
 }
 
-class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
+class _ValidateMpinScreenState extends State<ValidateMpinScreen> with RouteAware {
   final List<TextEditingController> _controllers =
       List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) appRouteObserver.subscribe(this, route);
+  }
+
+  @override
+  void didPopNext() {
+    // We came back into focus after a child route popped — reset.
+    _clearAll();
+  }
+
+  @override
   void dispose() {
+    appRouteObserver.unsubscribe(this);
     for (var controller in _controllers) {
       controller.dispose();
     }
@@ -29,12 +44,24 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
     super.dispose();
   }
 
-  void _handleInput(String value, int index) {
-    if (value.isNotEmpty) {
-      if (index < 3) {
-        _focusNodes[index + 1].requestFocus();
-      }
+  void _clearAll() {
+    for (final c in _controllers) {
+      c.clear();
     }
+    if (mounted) {
+      setState(() {});
+      _focusNodes[0].requestFocus();
+    }
+  }
+
+  void _handleInput(String value, int index) {
+    if (value.isNotEmpty && index < 3) {
+      _focusNodes[index + 1].requestFocus();
+    }
+    // Trigger rebuild so the Verify button's enabled state updates as the
+    // user types. Without this, the BlocConsumer's builder won't re-run on
+    // text changes and the button stays disabled.
+    setState(() {});
   }
 
   void _handleBackspace(RawKeyEvent event, int index) {

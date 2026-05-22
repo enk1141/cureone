@@ -35,3 +35,8 @@ class ToggleCategoryBillsSelection extends DashboardEvent {
 }
 
 class ClearSelection extends DashboardEvent {}
+
+class MarkBillPaid extends DashboardEvent {
+  final String id;
+  MarkBillPaid({required this.id});
+}

@@ -1,9 +1,20 @@
-﻿import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
+import 'package:my_cure_ui/config/app_theme.dart';
 import 'package:my_cure_ui/config/routes.dart';
+import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
+import 'package:my_cure_ui/features/payment/bloc/payment_history_bloc.dart';
+import 'package:my_cure_ui/shared/widgets/app_animations.dart';
+import 'package:my_cure_ui/shared/widgets/app_card.dart';
 
+/// Cure One dashboard — modern overlay layout:
+/// 1. Hero header with brand gradient (greeting + total due)
+/// 2. Overlay summary card that sits ON TOP of the hero edge (-34px translate)
+/// 3. Quick-action chips
+/// 4. Promotional banner carousel
+/// 5. 3-col colored utility tiles
+/// 6. Recent activity from PaymentHistoryRegistry
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -12,242 +23,290 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _currentBannerIndex = 0;
+  int _banner = 0;
 
-  int selectedMonth = DateTime.now().month;
-
-  get totalAmount => null;
-
-  // Define service themes (icon, color, glow color)
-  Map<String, dynamic> _getServiceTheme(String type) {
-    switch (type) {
-      case 'electricity':
-        return {
-          'icon': Icons.bolt_rounded,
-          'color': const Color(0xFFFF9F0A), // Warm orange/amber
-          'shadowColor': const Color(0xFFFF9F0A).withOpacity(0.25),
-        };
-      case 'hmwssb':
-        return {
-          'icon': Icons.water_drop_rounded,
-          'color': const Color(0xFF0A84FF), // Radiant blue
-          'shadowColor': const Color(0xFF0A84FF).withOpacity(0.25),
-        };
-      case 'property_tax':
-        return {
-          'icon': Icons.home_work_rounded,
-          'color': const Color(0xFF30D158), // Green
-          'shadowColor': const Color(0xFF30D158).withOpacity(0.25),
-        };
-      case 'trade':
-        return {
-          'icon': Icons.storefront_rounded,
-          'color': const Color(0xFFBF5AF2), // Purple
-          'shadowColor': const Color(0xFFBF5AF2).withOpacity(0.25),
-        };
-      case 'echallan':
-        return {
-          'icon': Icons.receipt_long_rounded,
-          'color': const Color(0xFFFF453A), // Red
-          'shadowColor': const Color(0xFFFF453A).withOpacity(0.25),
-        };
-      case 'broadband':
-      default:
-        return {
-          'icon': Icons.wifi_rounded,
-          'color': const Color(0xFF5E5CE6), // Indigo
-          'shadowColor': const Color(0xFF5E5CE6).withOpacity(0.25),
-        };
-    }
+  @override
+  void initState() {
+    super.initState();
+    context.read<DashboardBloc>().add(LoadBills());
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => DashboardBloc()..add(LoadBills()),
-      child: Scaffold(
-        body: Container(
-          color: const Color(0xFFFEFEFE),
-          child: SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  _buildHeader(context),
-                  const SizedBox(height: 12),
-                  _buildGreetingCard(),
-                  const SizedBox(height: 12),
-                  _buildBannerCarousel(),
-                  const SizedBox(height: 18),
-                  _buildPayAllAtOnceCard(),
-                  const SizedBox(height: 14),
-                  BlocBuilder<DashboardBloc, DashboardState>(
-                    builder: (context, state) {
-                      return _buildSummaryCard(state);
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                  _buildAllServicesHeader(),
-                  _buildServicesGrid(),
-                  const SizedBox(height: 60),
-                  _buildFooter(),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+    return Scaffold(
+      backgroundColor: AppColors.surface,
+      body: BlocBuilder<DashboardBloc, DashboardState>(
+        builder: (context, state) {
+          final pending = state.utilityBills
+              .where((b) => !((b['isPaid'] as bool?) ?? false))
+              .toList();
+          final paid = state.utilityBills
+              .where((b) => (b['isPaid'] as bool?) ?? false)
+              .toList();
+          final totalDue = pending.fold<double>(
+              0.0, (s, b) => s + (b['amount'] as num).toDouble());
 
-  Widget _buildGreetingCard() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 25),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Welcome",
-            style: TextStyle(
-              color: Color(0xFF0956CB),
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'Inter',
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        children: [
-          // Profile Avatar with gradient border
-          Container(
-            padding: const EdgeInsets.all(2),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [Color(0xFF0956CB), Color(0xFF0653C7)],
-              ),
-            ),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.white,
-              child: ClipOval(
-                child: Image.asset(
-                  "assets/logo.png",
-                  fit: BoxFit.contain,
-                  height: 22,
-                  width: 22,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // User location / app branding info
-          const Expanded(
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      "CURE ONE",
-                      style: TextStyle(
-                        color: Color(0xFF0956CB),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF0956CB),
-                      size: 16,
-                    ),
-                  ],
+                FadeSlideIn(
+                  offset: const Offset(0, -18),
+                  child: _HeroHeader(
+                      totalDue: totalDue, pendingCount: pending.length),
                 ),
-                Text(
-                  "Core Urban Region - CGG",
-                  style: TextStyle(
-                    color: Color(0xFF8A9A9A),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
+                Transform.translate(
+                  offset: const Offset(0, -34),
+                  child: Column(
+                    children: [
+                      FadeSlideIn(
+                        delay: const Duration(milliseconds: 120),
+                        child: _OverlaySummary(
+                          pending: pending.length,
+                          paid: paid.length,
+                          taxDue: state.utilityBills
+                              .where((b) =>
+                                  !((b['isPaid'] as bool?) ?? false) &&
+                                  (b['category'] == 'property_tax' ||
+                                      b['category'] == 'trade'))
+                              .fold<double>(
+                                  0.0,
+                                  (s, b) =>
+                                      s + (b['amount'] as num).toDouble()),
+                          totalDue: totalDue,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const FadeSlideIn(
+                        delay: Duration(milliseconds: 200),
+                        child: _QuickActions(),
+                      ),
+                      const SizedBox(height: 20),
+                      FadeSlideIn(
+                        delay: const Duration(milliseconds: 280),
+                        child: _BannerCarousel(
+                          current: _banner,
+                          onChange: (i) => setState(() => _banner = i),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      FadeSlideIn(
+                        delay: const Duration(milliseconds: 360),
+                        child: _ServicesSection(bills: state.bills),
+                      ),
+                      const SizedBox(height: 22),
+                      const FadeSlideIn(
+                        delay: Duration(milliseconds: 440),
+                        child: _RecentActivity(),
+                      ),
+                      // Clearance for the floating bottom nav.
+                      const SizedBox(height: 110),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-          // Action Buttons: QR Scan, Settings, Notifications
-          Row(
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hero header
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _HeroHeader extends StatelessWidget {
+  const _HeroHeader({required this.totalDue, required this.pendingCount});
+
+  final double totalDue;
+  final int pendingCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: AppGradients.brand,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(36),
+          bottomRight: Radius.circular(36),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 56),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeaderButton(
-                icon: Icons.qr_code_scanner_rounded,
-                onPressed: () {},
+              Row(
+                children: [
+                  Container(
+                    height: 42,
+                    width: 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.16),
+                      border:
+                          Border.all(color: Colors.white.withOpacity(0.35)),
+                    ),
+                    child: const Icon(Icons.person_rounded,
+                        color: Colors.white, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome back',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.75),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Text(
+                          'Ramesh Kumar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _CircleIconButton(
+                    icon: Icons.notifications_none_rounded,
+                    hasBadge: true,
+                    onTap: () {},
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              _buildHeaderButton(
-                icon: Icons.settings_outlined,
-                onPressed: () {},
+              const SizedBox(height: 26),
+              Text(
+                'Total due this month',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.78),
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.4,
+                ),
               ),
-              const SizedBox(width: 8),
-              _buildHeaderButton(
-                icon: Icons.notifications_none_rounded,
-                hasBadge: true,
-                onPressed: () {},
+              const SizedBox(height: 6),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  AnimatedCounter(
+                    value: totalDue,
+                    prefix: '₹',
+                    format: _format,
+                    duration: const Duration(milliseconds: 1100),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(AppRadii.pill),
+                      ),
+                      child: Text(
+                        '$pendingCount pending',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeaderButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    bool hasBadge = false,
-  }) {
+  String _format(double v) {
+    final s = v.toStringAsFixed(2);
+    final parts = s.split('.');
+    final whole = parts[0];
+    // Indian number grouping: 1,23,456.78
+    final buf = StringBuffer();
+    if (whole.length <= 3) {
+      buf.write(whole);
+    } else {
+      final last3 = whole.substring(whole.length - 3);
+      var rest = whole.substring(0, whole.length - 3);
+      final chunks = <String>[];
+      while (rest.length > 2) {
+        chunks.insert(0, rest.substring(rest.length - 2));
+        rest = rest.substring(0, rest.length - 2);
+      }
+      if (rest.isNotEmpty) chunks.insert(0, rest);
+      buf.write(chunks.join(','));
+      buf.write(',');
+      buf.write(last3);
+    }
+    buf.write('.');
+    buf.write(parts[1]);
+    return buf.toString();
+  }
+}
+
+class _CircleIconButton extends StatelessWidget {
+  const _CircleIconButton({
+    required this.icon,
+    required this.onTap,
+    this.hasBadge = false,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool hasBadge;
+
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          height: 38,
-          width: 38,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: const Color(0xFFE5E9F2),
-              width: 1,
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadii.pill),
+          child: Container(
+            height: 42,
+            width: 42,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.16),
+              border: Border.all(color: Colors.white.withOpacity(0.35)),
             ),
-          ),
-          child: IconButton(
-            icon: Icon(icon, color: const Color(0xFF0653C7), size: 18),
-            onPressed: onPressed,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            splashRadius: 20,
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
         ),
         if (hasBadge)
           Positioned(
-            right: 2,
-            top: 2,
+            right: 6,
+            top: 6,
             child: Container(
-              height: 7,
-              width: 7,
+              height: 8,
+              width: 8,
               decoration: const BoxDecoration(
-                color: Color(0xFFFF453A),
+                color: AppColors.danger,
                 shape: BoxShape.circle,
               ),
             ),
@@ -255,250 +314,66 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ],
     );
   }
+}
 
-  Widget _buildBannerCarousel() {
-    final List<Widget> banners = [
-      _buildBannerCard(
-        line1: "PAY ELECTRICITY BILL",
-        line2: "THE EASY WAY",
-        tagline: "Pay your Electricity Bill on MYCURE",
-        badgeHighlight: "SECURE & FAST",
-        badgeRest: "on ELECTRICITY",
-        photoAsset: "assets/electricity_photo.png",
-      ),
-      _buildBannerCard(
-        line1: "PAY WATER BILLS",
-        line2: "THE EASY WAY",
-        tagline: "Pay your HMWSSB Water Bills on MYCURE",
-        badgeHighlight: "24/7 ONLINE",
-        badgeRest: "on WATER BILLS",
-        photoAsset: "assets/water_bill_photo.png",
-      ),
-      _buildBannerCard(
-        line1: "PAY PROPERTY TAX",
-        line2: "THE EASY WAY",
-        tagline: "Pay your Property Tax on MYCURE",
-        badgeHighlight: "5% REBATE*",
-        badgeRest: "on PROPERTY TAX",
-        photoAsset: "assets/property_tax_photo.png",
-      ),
-      _buildBannerCard(
-        line1: "RENEW TRADE LICENSE",
-        line2: "THE EASY WAY",
-        tagline: "Renew your Trade License on MYCURE",
-        badgeHighlight: "FAST RENEWAL",
-        badgeRest: "on TRADE LICENSE",
-        photoAsset: "assets/trade_license_photo.png",
-      ),
-      _buildBannerCard(
-        line1: "CLEAR E-CHALLANS",
-        line2: "THE EASY WAY",
-        tagline: "Pay your Traffic Challans on MYCURE",
-        badgeHighlight: "ZERO FEES",
-        badgeRest: "on TRAFFIC CHALLANS",
-        photoAsset: "assets/echallan_photo.png",
-      ),
-    ];
+// ─────────────────────────────────────────────────────────────────────────────
+// Overlay summary card — sits on top of the hero edge.
+// ─────────────────────────────────────────────────────────────────────────────
 
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        children: [
-          CarouselSlider(
-            items: banners.map((banner) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8, left: 8),
-                child: banner,
-              );
-            }).toList(),
-            options: CarouselOptions(
-              height: 140,
-              viewportFraction: 0.92,
-              initialPage: 0,
-              enableInfiniteScroll: true,
-              reverse: false,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 4),
-              autoPlayAnimationDuration: const Duration(milliseconds: 800),
-              autoPlayCurve: Curves.fastOutSlowIn,
-              enlargeCenterPage: false,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _currentBannerIndex = index;
-                });
-              },
-            ),
-          ),
-          Positioned(
-            bottom: 12,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: banners.asMap().entries.map((entry) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  width: _currentBannerIndex == entry.key ? 18.0 : 6.0,
-                  height: 6.0,
-                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
-                    color: _currentBannerIndex == entry.key
-                        ? const Color(0xFF0956CB)
-                        : const Color(0xFF0956CB).withOpacity(0.3),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+class _OverlaySummary extends StatelessWidget {
+  const _OverlaySummary({
+    required this.pending,
+    required this.paid,
+    required this.taxDue,
+    required this.totalDue,
+  });
 
-  Widget _buildBannerCard({
-    required String line1,
-    required String line2,
-    required String tagline,
-    required String badgeHighlight,
-    required String badgeRest,
-    required String photoAsset,
-  }) {
-    return Container(
-      margin: EdgeInsets.zero,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            Colors.white,
-            Color(0xFF251A43),
-            Colors.white,
-          ],
+  final int pending;
+  final int paid;
+  final double taxDue;
+  final double totalDue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 14),
+        decoration: BoxDecoration(
+          // Clean off-white shade — no aggressive gradient.
+          color: const Color(0xFFFBFCFE),
+          borderRadius: BorderRadius.circular(AppRadii.xl),
+          border: Border.all(color: AppColors.border),
+          boxShadow: AppShadows.soft,
         ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFFE5E9F2),
-          width: 1,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
+        child: Row(
           children: [
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 175,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Image.asset(
-                      photoAsset,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.centerRight,
-                          end: Alignment.centerLeft,
-                          colors: [
-                            Color(0x001E1435),
-                            Color(0x801E1435),
-                            Colors.white,
-                          ],
-                          stops: [0.0, 0.5, 0.95],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            _stat(
+              icon: Icons.schedule_rounded,
+              label: 'Pending',
+              value: '$pending',
+              color: AppColors.warning,
             ),
-            Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 120, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          line1,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
-                            color: const Color(0xFF0653C7),
-                            height: 1.15,
-                            letterSpacing: 0.1,
-                          ),
-                        ),
-                        Text(
-                          line2,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
-                            color: const Color(0xFF0653C7),
-                            height: 1.15,
-                            letterSpacing: 0.1,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          tagline,
-                          style: const TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF30D158),
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          "Quick > simple > secure.",
-                          style: TextStyle(
-                            fontSize: 7.5,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    CustomPaint(
-                      painter: RibbonPainter(),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              badgeHighlight,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              badgeRest,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 7,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            _divider(),
+            _stat(
+              icon: Icons.check_circle_rounded,
+              label: 'Paid',
+              value: '$paid',
+              color: AppColors.success,
+            ),
+            _divider(),
+            _stat(
+              icon: Icons.account_balance_rounded,
+              label: 'Tax',
+              value: '₹${_compact(taxDue)}',
+              color: AppColors.catPropertyTax,
+            ),
+            _divider(),
+            _stat(
+              icon: Icons.currency_rupee_rounded,
+              label: 'Amount',
+              value: '₹${_compact(totalDue)}',
+              color: AppColors.primary,
             ),
           ],
         ),
@@ -506,434 +381,175 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildAllServicesHeader() {
-    return const Padding(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 6),
-      child: Text(
-        "Utility Services",
-        style: TextStyle(
-          color: Color(0xFF0956CB),
-          fontSize: 16,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
+  /// Compact rupee display: 12500 → 12.5K, 1250000 → 12.5L.
+  String _compact(double v) {
+    if (v >= 10000000) {
+      return '${(v / 10000000).toStringAsFixed(1)}Cr';
+    }
+    if (v >= 100000) {
+      return '${(v / 100000).toStringAsFixed(1)}L';
+    }
+    if (v >= 1000) {
+      return '${(v / 1000).toStringAsFixed(1)}K';
+    }
+    return v.toStringAsFixed(0);
   }
 
-  Widget _buildServicesGrid() {
-    return BlocBuilder<DashboardBloc, DashboardState>(
-      builder: (context, state) {
-        if (state.bills.isEmpty) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(40),
-              child: CircularProgressIndicator(
-                color: Color(0xFF0956CB),
-              ),
-            ),
-          );
-        }
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding:
-              const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 0.88,
-          ),
-          itemCount: state.bills.length,
-          itemBuilder: (context, index) {
-            final bill = state.bills[index];
-            final title = bill['title'] as String;
-            final type = bill['type'] as String;
-            final theme = _getServiceTheme(type);
-
-            final IconData iconData = theme['icon'];
-            final Color accentColor = theme['color'];
-
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: const Color(0xFFE5E9F2),
-                  width: 1,
-                ),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.utilityDetails,
-                      arguments: {
-                        'category': type,
-                        'bloc': BlocProvider.of<DashboardBloc>(context),
-                      },
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // 🔷 TOP SECTION (Icon + Title)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 42,
-                              width: 42,
-                              decoration: BoxDecoration(
-                                color: accentColor.withOpacity(0.12),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                iconData,
-                                color: accentColor,
-                                size: 22,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF0653C7),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // 🔷 BOTTOM SECTION (Amount + Arrow)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "₹${(bill['amount'] ?? 0).toString()}",
-                              style: TextStyle(
-                                color: accentColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Container(
-                              height: 32,
-                              width: 32,
-                              decoration: BoxDecoration(
-                                color: accentColor.withOpacity(0.12),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 14,
-                                color: accentColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildPayAllAtOnceCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: const Color(0xFFE5E9F2),
-            width: 1,
-          ),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(24),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.payAllAtOnce,
-                arguments: BlocProvider.of<DashboardBloc>(context),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    height: 46,
-                    width: 46,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0956CB).withOpacity(0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.payments_rounded,
-                      color: const Color(0xFF0653C7),
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Pay all at once",
-                          style: TextStyle(
-                            color: const Color(0xFF0653C7),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          "Settle all pending bills in a single click",
-                          style: TextStyle(
-                            color: Color(0xFF8A9A9A),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0956CB),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF0956CB).withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward_rounded,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFooter() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+  Widget _stat({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Expanded(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            "Designed & Developed By",
-            style: TextStyle(
-              color: Color(0xFF8A9A9A),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+          Container(
+            height: 30,
+            width: 30,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 15, color: color),
+          ),
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w900,
+                color: color,
+              ),
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/logo.png",
-                height: 28,
-                width: 28,
-              ),
-              const SizedBox(width: 8),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "CENTRE FOR GOOD GOVERNANCE",
-                    style: TextStyle(
-                      color: Color(0xFF0956CB),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    "Knowledge â€¢ Technology â€¢ People",
-                    style: TextStyle(
-                      color: Color(0xFF8A9A9A),
-                      fontSize: 8,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          const SizedBox(height: 1),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textMuted,
+            ),
           ),
         ],
       ),
     );
   }
 
-  String _getMonthName(int month) {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ];
-    return months[month - 1];
+  Widget _divider() {
+    return Container(
+      height: 32,
+      width: 1,
+      color: AppColors.border,
+    );
   }
+}
 
-  Widget _buildSummaryCard(DashboardState state) {
-    final monthlyBills =
-        state.utilityBills.where((b) => b['month'] == selectedMonth).toList();
+// ─────────────────────────────────────────────────────────────────────────────
+// Quick actions
+// ─────────────────────────────────────────────────────────────────────────────
 
-    final pendingBills =
-        monthlyBills.where((b) => !(b['isPaid'] ?? false)).length;
+class _QuickActions extends StatelessWidget {
+  const _QuickActions();
 
-    final paidBills = monthlyBills.where((b) => (b['isPaid'] ?? false)).length;
-
-    final totalAmount = monthlyBills
-        .where((b) => !(b['isPaid'] ?? false))
-        .fold(0.0, (sum, item) => sum + (item['amount'] as double));
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      _QuickAction(
+        icon: Icons.payments_rounded,
+        label: 'Pay All',
+        color: AppColors.primary,
+        onTap: () => Navigator.pushNamed(
+          context,
+          AppRoutes.payAllAtOnce,
+          arguments: context.read<DashboardBloc>(),
+        ),
+      ),
+      _QuickAction(
+        icon: Icons.add_card_rounded,
+        label: 'Register',
+        color: AppColors.success,
+        onTap: () => Navigator.pushNamed(
+          context,
+          AppRoutes.registerUtility,
+          arguments: context.read<DashboardBloc>(),
+        ),
+      ),
+      _QuickAction(
+        icon: Icons.history_rounded,
+        label: 'History',
+        color: AppColors.catTrade,
+        onTap: () =>
+            Navigator.pushNamed(context, AppRoutes.paymentHistory),
+      ),
+      _QuickAction(
+        icon: Icons.support_agent_rounded,
+        label: 'Help',
+        color: AppColors.warning,
+        onTap: () {},
+      ),
+    ];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Color(0xFF0956CB).withOpacity(0.06),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Color(0xFF0956CB).withOpacity(0.1)),
-        ),
+      child: Row(
+        children: items
+            .map((a) => Expanded(child: _QuickActionTile(action: a)))
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _QuickAction {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+}
+
+class _QuickActionTile extends StatelessWidget {
+  const _QuickActionTile({required this.action});
+  final _QuickAction action;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        onTap: action.onTap,
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Monthly Summary",
-                  style: TextStyle(
-                    color: Color(0xFF0956CB),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<int>(
-                    value: selectedMonth,
-                    dropdownColor: Colors.white,
-                    underline: const SizedBox(),
-                    icon: const Icon(Icons.keyboard_arrow_down,
-                        color: const Color(0xFF0653C7)),
-                    style: const TextStyle(
-                        color: const Color(0xFF0653C7), fontSize: 12),
-                    items: List.generate(12, (index) {
-                      final month = index + 1;
-                      return DropdownMenuItem(
-                        value: month,
-                        child: Text(_getMonthName(month)),
-                      );
-                    }),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedMonth = value!;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(" Pending",
-                        style:
-                            TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-                    Text("$pendingBills",
-                        style: const TextStyle(
-                            color: Color(0xFFFF9F0A),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text("Paid",
-                        style:
-                            TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-                    Text("$paidBills",
-                        style: const TextStyle(
-                            color: Color(0xFF30D158),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
             Container(
-              height: 1,
-              color: Color(0xFF0956CB).withOpacity(0.08),
+              height: 54,
+              width: 54,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: action.color.withOpacity(0.18)),
+                boxShadow: AppShadows.tile(action.color),
+              ),
+              child: Icon(action.icon, color: action.color, size: 24),
             ),
             const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Pending Amount",
-                    style: TextStyle(color: Color(0xFF8A9A9A), fontSize: 11)),
-                Text("₹${totalAmount.toStringAsFixed(2)}",
-                    style: const TextStyle(
-                        color: Color(0xFF0956CB),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
-              ],
+            Text(
+              action.label,
+              style: const TextStyle(
+                color: AppColors.primaryDark,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
@@ -942,54 +558,512 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-class RibbonPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF0C4DA2)
-      ..style = PaintingStyle.fill;
+// ─────────────────────────────────────────────────────────────────────────────
+// Banner carousel
+// ─────────────────────────────────────────────────────────────────────────────
 
-    final path = Path();
-    path.moveTo(0, 0);
-    path.lineTo(size.width - 12, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
+class _BannerCarousel extends StatelessWidget {
+  const _BannerCarousel({required this.current, required this.onChange});
 
-    canvas.drawPath(path, paint);
-
-    // Draw dashed inner border
-    final dashPaint = Paint()
-      ..color = Color(0xFF0956CB).withOpacity(0.6)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    final dashPath = Path();
-    dashPath.moveTo(2, 2);
-    dashPath.lineTo(size.width - 13, 2);
-    dashPath.lineTo(size.width - 3, size.height - 2);
-    dashPath.lineTo(2, size.height - 2);
-    dashPath.close();
-
-    _drawDashedPath(canvas, dashPath, dashPaint);
-  }
-
-  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
-    const dashWidth = 3.0;
-    const dashSpace = 2.0;
-    double distance = 0.0;
-    for (final pathMetric in path.computeMetrics()) {
-      while (distance < pathMetric.length) {
-        canvas.drawPath(
-          pathMetric.extractPath(distance, distance + dashWidth),
-          paint,
-        );
-        distance += dashWidth + dashSpace;
-      }
-      distance = 0.0;
-    }
-  }
+  final int current;
+  final ValueChanged<int> onChange;
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    final banners = <_Banner>[
+      _Banner(
+        title: 'Pay Property Tax',
+        subtitle: 'Save up to 5% rebate on early payment',
+        badge: '5% REBATE',
+        color: AppColors.catPropertyTax,
+        icon: Icons.home_work_rounded,
+        asset: 'assets/property_tax_photo.png',
+      ),
+      _Banner(
+        title: 'Pay Electricity',
+        subtitle: 'Quick, secure, zero processing fee',
+        badge: 'ZERO FEE',
+        color: AppColors.catElectricity,
+        icon: Icons.bolt_rounded,
+        asset: 'assets/electricity_photo.png',
+      ),
+      _Banner(
+        title: 'Water Bill',
+        subtitle: '24/7 HMWSSB online payments',
+        badge: '24/7',
+        color: AppColors.catWater,
+        icon: Icons.water_drop_rounded,
+        asset: 'assets/water_bill_photo.png',
+      ),
+      _Banner(
+        title: 'eChallan',
+        subtitle: 'Clear traffic challans in seconds',
+        badge: 'NEW',
+        color: AppColors.catEChallan,
+        icon: Icons.receipt_long_rounded,
+        asset: 'assets/echallan_photo.png',
+      ),
+    ];
+
+    return Column(
+      children: [
+        CarouselSlider(
+          // Pad each card vertically so the colored shadow has room to render
+          // inside the viewport (was being clipped at 130px).
+          items: banners
+              .map((b) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: _BannerCard(banner: b),
+                  ))
+              .toList(),
+          options: CarouselOptions(
+            height: 156,
+            viewportFraction: 0.88,
+            enlargeCenterPage: false,
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 4),
+            onPageChanged: (i, _) => onChange(i),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: banners.asMap().entries.map((e) {
+            final active = e.key == current;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              height: 6,
+              width: active ? 20 : 6,
+              decoration: BoxDecoration(
+                color: active
+                    ? AppColors.primary
+                    : AppColors.primary.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _Banner {
+  final String title;
+  final String subtitle;
+  final String badge;
+  final Color color;
+  final IconData icon;
+  final String asset;
+  _Banner({
+    required this.title,
+    required this.subtitle,
+    required this.badge,
+    required this.color,
+    required this.icon,
+    required this.asset,
+  });
+}
+
+class _BannerCard extends StatelessWidget {
+  const _BannerCard({required this.banner});
+  final _Banner banner;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadii.lg),
+          border: Border.all(color: banner.color.withOpacity(0.18)),
+          boxShadow: AppShadows.tile(banner.color),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadii.lg),
+          child: Stack(
+            children: [
+              // Right-side asset image with a gradient fade into the card.
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 170,
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (bounds) => const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [Colors.transparent, Colors.black, Colors.black],
+                    stops: [0.0, 0.35, 1.0],
+                  ).createShader(bounds),
+                  child: Image.asset(
+                    banner.asset,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.centerRight,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: banner.color.withOpacity(0.10),
+                      alignment: Alignment.center,
+                      child: Icon(banner.icon,
+                          color: banner.color, size: 48),
+                    ),
+                  ),
+                ),
+              ),
+              // Soft color wash overlay so text on the left stays legible.
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Colors.white,
+                        Colors.white.withOpacity(0.92),
+                        Colors.white.withOpacity(0.0),
+                      ],
+                      stops: const [0.0, 0.45, 0.75],
+                    ),
+                  ),
+                ),
+              ),
+              // Content on the left.
+              Padding(
+                padding:
+                    const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: banner.color,
+                              borderRadius:
+                                  BorderRadius.circular(AppRadii.pill),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: banner.color.withOpacity(0.35),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              banner.badge,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            banner.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.primaryDark,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            banner.subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.primaryDark.withOpacity(0.62),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 130),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Services — 3-col colored tiles
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ServicesSection extends StatelessWidget {
+  const _ServicesSection({required this.bills});
+  final List<Map<String, dynamic>> bills;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Utility Services',
+                style: TextStyle(
+                  color: AppColors.primaryDark,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.myUtilities,
+                  arguments: context.read<DashboardBloc>(),
+                ),
+                child: const Row(
+                  children: [
+                    Text(
+                      'View all',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(width: 2),
+                    Icon(Icons.arrow_forward_rounded,
+                        size: 14, color: AppColors.primary),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (bills.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(28),
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: bills.length,
+              gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.92,
+              ),
+              itemBuilder: (context, i) {
+                final bill = bills[i];
+                final cat =
+                    UtilityCategory.fromKey(bill['type'] as String);
+                return TintedCard(
+                  tint: cat.color,
+                  elevated: true,
+                  padding: const EdgeInsets.all(10),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.utilityDetails,
+                      arguments: {
+                        'category': cat.key,
+                        'bloc': context.read<DashboardBloc>(),
+                      },
+                    );
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 42,
+                        width: 42,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: AppShadows.tile(cat.color),
+                        ),
+                        child:
+                            Icon(cat.icon, color: cat.color, size: 22),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        bill['title'] as String,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.primaryDark,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Recent activity from PaymentHistoryRegistry
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _RecentActivity extends StatelessWidget {
+  const _RecentActivity();
+
+  @override
+  Widget build(BuildContext context) {
+    final recent = PaymentHistoryRegistry.instance.all.take(3).toList();
+    if (recent.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Recent Activity',
+                style: TextStyle(
+                  color: AppColors.primaryDark,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(
+                    context, AppRoutes.paymentHistory),
+                child: const Row(
+                  children: [
+                    Text(
+                      'See all',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(width: 2),
+                    Icon(Icons.arrow_forward_rounded,
+                        size: 14, color: AppColors.primary),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: List.generate(recent.length * 2 - 1, (i) {
+                if (i.isOdd) {
+                  return const Divider(
+                    height: 1,
+                    indent: 14,
+                    endIndent: 14,
+                    color: AppColors.border,
+                  );
+                }
+                final r = recent[i ~/ 2];
+                final cat = UtilityCategory.fromKey(
+                    r.bills.first['category'] as String);
+                final isMulti = r.bills.length > 1;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 38,
+                        width: 38,
+                        decoration: BoxDecoration(
+                          color: cat.color.withOpacity(0.14),
+                          shape: BoxShape.circle,
+                        ),
+                        child:
+                            Icon(cat.icon, color: cat.color, size: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isMulti
+                                  ? '${r.bills.length} bills paid'
+                                  : r.bills.first['name'] as String,
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryDark,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${_fmt(r.date)} · ${r.method}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        '₹${r.amount.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _fmt(DateTime d) {
+    const m = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${d.day.toString().padLeft(2, '0')} ${m[d.month - 1]}';
+  }
 }
