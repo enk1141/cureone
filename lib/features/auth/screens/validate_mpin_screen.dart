@@ -15,9 +15,16 @@ class ValidateMpinScreen extends StatefulWidget {
 }
 
 class _ValidateMpinScreenState extends State<ValidateMpinScreen> with RouteAware {
-  final List<TextEditingController> _controllers =
-      List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final TextEditingController _mpinController = TextEditingController();
+  final FocusNode _mpinFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _mpinFocusNode.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -35,45 +42,20 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> with RouteAware
   @override
   void dispose() {
     appRouteObserver.unsubscribe(this);
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
+    _mpinController.dispose();
+    _mpinFocusNode.dispose();
     super.dispose();
   }
 
   void _clearAll() {
-    for (final c in _controllers) {
-      c.clear();
-    }
+    _mpinController.clear();
     if (mounted) {
       setState(() {});
-      _focusNodes[0].requestFocus();
+      _mpinFocusNode.requestFocus();
     }
   }
 
-  void _handleInput(String value, int index) {
-    if (value.isNotEmpty && index < 3) {
-      _focusNodes[index + 1].requestFocus();
-    }
-    // Trigger rebuild so the Verify button's enabled state updates as the
-    // user types. Without this, the BlocConsumer's builder won't re-run on
-    // text changes and the button stays disabled.
-    setState(() {});
-  }
-
-  void _handleBackspace(RawKeyEvent event, int index) {
-    if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
-      if (_controllers[index].text.isEmpty && index > 0) {
-        _focusNodes[index - 1].requestFocus();
-      }
-    }
-  }
-
-  String get _enteredMpin =>
-      _controllers.map((c) => c.text).join();
+  String get _enteredMpin => _mpinController.text;
 
   @override
   Widget build(BuildContext context) {
@@ -113,10 +95,8 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> with RouteAware
                   backgroundColor: Colors.redAccent,
                 ),
               );
-              for (var controller in _controllers) {
-                controller.clear();
-              }
-              _focusNodes[0].requestFocus();
+              _mpinController.clear();
+              _mpinFocusNode.requestFocus();
             }
           },
           builder: (context, state) {
@@ -193,56 +173,80 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> with RouteAware
                       ),
                       child: Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: List.generate(4, (index) {
-                              return SizedBox(
-                                height: 60,
-                                width: 60,
-                                child: RawKeyboardListener(
-                                  focusNode: FocusNode(),
-                                  onKey: (event) =>
-                                      _handleBackspace(event, index),
+                          GestureDetector(
+                            onTap: () {
+                              _mpinFocusNode.requestFocus();
+                            },
+                            child: Stack(
+                              children: [
+                                Opacity(
+                                  opacity: 0,
                                   child: TextField(
-                                    controller: _controllers[index],
-                                    focusNode: _focusNodes[index],
+                                    controller: _mpinController,
+                                    focusNode: _mpinFocusNode,
                                     keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    maxLength: 1,
+                                    maxLength: 4,
                                     inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
+                                      FilteringTextInputFormatter.digitsOnly
                                     ],
-                                    obscureText: true,
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w600,
-                                      color: darkText,
-                                    ),
-                                    decoration: InputDecoration(
-                                      counterText: '',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: accentTeal,
-                                          width: 2,
-                                        ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: primaryTeal,
-                                          width: 2,
-                                        ),
-                                      ),
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    onChanged: (value) {
-                                      _handleInput(value, index);
+                                    onChanged: (val) {
+                                      setState(() {});
+                                      if (val.length == 4) {
+                                        if (_enteredMpin == widget.mpin) {
+                                          context.read<MpinBloc>().add(
+                                                SetMpinSubmitted(
+                                                  mpin: widget.mpin,
+                                                  confirmMpin: widget.mpin,
+                                                ),
+                                              );
+                                        } else {
+                                          context.read<MpinBloc>().add(
+                                                SetMpinSubmitted(
+                                                  mpin: widget.mpin,
+                                                  confirmMpin: _enteredMpin,
+                                                ),
+                                              );
+                                        }
+                                      }
                                     },
                                   ),
                                 ),
-                              );
-                            }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(4, (index) {
+                                    final bool isFocused =
+                                        _mpinFocusNode.hasFocus &&
+                                        _mpinController.text.length == index;
+                                    final bool hasText =
+                                        index < _mpinController.text.length;
+
+                                    return Container(
+                                      height: 60,
+                                      width: 60,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(
+                                          color: isFocused
+                                              ? accentTeal
+                                              : const Color(0xFFE5E9F2),
+                                          width: isFocused ? 2.0 : 1.5,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        hasText ? "•" : "",
+                                        style: const TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.w600,
+                                          color: darkText,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 32),
                           SizedBox(

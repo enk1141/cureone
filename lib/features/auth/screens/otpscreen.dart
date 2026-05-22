@@ -15,10 +15,17 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> with RouteAware {
-  // 6 separate controllers for individual box capture
-  final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  // 1 single controller for the entire OTP
+  final TextEditingController _otpController = TextEditingController();
+  final FocusNode _otpFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _otpFocusNode.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -33,29 +40,23 @@ class _OtpScreenState extends State<OtpScreen> with RouteAware {
   }
 
   void _clearAll() {
-    for (final c in _controllers) {
-      c.clear();
-    }
+    _otpController.clear();
     if (mounted) {
       setState(() {});
-      _focusNodes[0].requestFocus();
+      _otpFocusNode.requestFocus();
     }
   }
 
   @override
   void dispose() {
     appRouteObserver.unsubscribe(this);
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
+    _otpController.dispose();
+    _otpFocusNode.dispose();
     super.dispose();
   }
 
   String _getCombinedCode() {
-    return _controllers.map((controller) => controller.text).join();
+    return _otpController.text;
   }
 
   @override
@@ -169,74 +170,73 @@ class _OtpScreenState extends State<OtpScreen> with RouteAware {
                         child: Column(
                           children: [
                             // NEW UPDATED CODE:
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(6, (index) {
-                                return SizedBox(
-                                  height: 52,
-                                  width: 44,
-                                  child: KeyboardListener(
-                                    focusNode:
-                                        FocusNode(), // Intercepts key strokes specifically for this box item
-                                    onKeyEvent: (KeyEvent event) {
-                                      if (event is KeyDownEvent) {
-                                        // Checks if backspace key was struck on an empty text cell
-                                        if (event.logicalKey ==
-                                            LogicalKeyboardKey.backspace) {
-                                          if (_controllers[index]
-                                                  .text
-                                                  .isEmpty &&
-                                              index > 0) {
-                                            _focusNodes[index - 1]
-                                                .requestFocus();
-                                          }
-                                        }
-                                      }
-                                    },
+                            GestureDetector(
+                              onTap: () {
+                                _otpFocusNode.requestFocus();
+                              },
+                              child: Stack(
+                                children: [
+                                  // Hidden TextField
+                                  Opacity(
+                                    opacity: 0,
                                     child: TextField(
-                                      controller: _controllers[index],
-                                      focusNode: _focusNodes[index],
+                                      controller: _otpController,
+                                      focusNode: _otpFocusNode,
                                       keyboardType: TextInputType.number,
-                                      textAlign: TextAlign.center,
-                                      maxLength: 1,
+                                      maxLength: 6,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly
                                       ],
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: darkText,
-                                      ),
-                                      decoration: InputDecoration(
-                                        counterText: '',
-                                        filled: true,
-                                        fillColor: const Color(0xFFF4F6F9),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: const BorderSide(
-                                              color: Color(0xFFE5E9F2),
-                                              width: 1.5),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: const BorderSide(
-                                              color: accentTeal, width: 2),
-                                        ),
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-                                      onChanged: (value) {
-                                        if (value.isNotEmpty && index < 5) {
-                                          _focusNodes[index + 1].requestFocus();
-                                        } else if (value.isEmpty && index > 0) {
-                                          _focusNodes[index - 1].requestFocus();
+                                      onChanged: (val) {
+                                        setState(() {});
+                                        if (val.length == 6) {
+                                          context
+                                              .read<OtpBloc>()
+                                              .add(OtpSubmitted(val));
                                         }
                                       },
                                     ),
                                   ),
-                                );
-                              }),
+                                  // Visual Boxes
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: List.generate(6, (index) {
+                                      final bool isFocused =
+                                          _otpFocusNode.hasFocus &&
+                                          _otpController.text.length == index;
+                                      final bool hasText =
+                                          index < _otpController.text.length;
+                                          
+                                      return Container(
+                                        height: 52,
+                                        width: 44,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF4F6F9),
+                                          border: Border.all(
+                                            color: isFocused
+                                                ? accentTeal
+                                                : const Color(0xFFE5E9F2),
+                                            width: isFocused ? 2.0 : 1.5,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          hasText
+                                              ? _otpController.text[index]
+                                              : "",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: darkText,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 28),
 
@@ -334,7 +334,7 @@ class _OtpScreenState extends State<OtpScreen> with RouteAware {
                             SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                "Secure • Encrypted • Official CURE ONE App",
+                                "Secure • Encrypted • Official CureOne App",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,

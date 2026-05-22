@@ -13,16 +13,24 @@ class CreateMpinScreen extends StatefulWidget {
 }
 
 class _CreateMpinScreenState extends State<CreateMpinScreen> with RouteAware {
-  // 4 Controllers & FocusNodes for the first MPIN row
-  final List<TextEditingController> _mpinControllers =
-      List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _mpinFocusNodes = List.generate(4, (_) => FocusNode());
+  // 1 single controller for the MPIN row
+  final TextEditingController _mpinController = TextEditingController();
+  final FocusNode _mpinFocusNode = FocusNode();
 
-  // 4 Controllers & FocusNodes for the confirmation MPIN row
-  final List<TextEditingController> _confirmControllers =
-      List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _confirmFocusNodes =
-      List.generate(4, (_) => FocusNode());
+  // 1 single controller for the confirmation MPIN row
+  final TextEditingController _confirmController = TextEditingController();
+  final FocusNode _confirmFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _mpinFocusNode.addListener(() {
+      setState(() {});
+    });
+    _confirmFocusNode.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -38,38 +46,26 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> with RouteAware {
   }
 
   void _clearAll() {
-    for (final c in _mpinControllers) {
-      c.clear();
-    }
-    for (final c in _confirmControllers) {
-      c.clear();
-    }
+    _mpinController.clear();
+    _confirmController.clear();
     if (mounted) {
       setState(() {});
-      _mpinFocusNodes[0].requestFocus();
+      _mpinFocusNode.requestFocus();
     }
   }
 
   @override
   void dispose() {
     appRouteObserver.unsubscribe(this);
-    for (var c in _mpinControllers) {
-      c.dispose();
-    }
-    for (var n in _mpinFocusNodes) {
-      n.dispose();
-    }
-    for (var c in _confirmControllers) {
-      c.dispose();
-    }
-    for (var n in _confirmFocusNodes) {
-      n.dispose();
-    }
+    _mpinController.dispose();
+    _mpinFocusNode.dispose();
+    _confirmController.dispose();
+    _confirmFocusNode.dispose();
     super.dispose();
   }
 
-  String _getMpin() => _mpinControllers.map((c) => c.text).join();
-  String _getConfirmMpin() => _confirmControllers.map((c) => c.text).join();
+  String _getMpin() => _mpinController.text;
+  String _getConfirmMpin() => _confirmController.text;
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +87,10 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> with RouteAware {
                       content: Text(state.error),
                       backgroundColor: Colors.redAccent),
                 );
-                for (var controller in _confirmControllers) {
+                for (var controller in [_confirmController]) {
                   controller.clear();
                 }
-                _confirmFocusNodes[0].requestFocus();
+                _confirmFocusNode.requestFocus();
               } else if (state is MpinSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -194,44 +190,68 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> with RouteAware {
                                   color: darkText),
                             ),
                             const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(4, (index) {
-                                return SizedBox(
-                                  height: 52,
-                                  width: 52,
-                                  child: TextField(
-                                    controller: _mpinControllers[index],
-                                    focusNode: _mpinFocusNodes[index],
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    obscureText:
-                                        true, // Hide inputs for security
-                                    maxLength: 1,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: darkText),
-                                    decoration: _getInputDecoration(accentTeal),
-                                    onChanged: (value) {
-                                      if (value.isNotEmpty && index < 3) {
-                                        _mpinFocusNodes[index + 1]
-                                            .requestFocus();
-                                      } else if (value.isEmpty && index > 0) {
-                                        _mpinFocusNodes[index - 1]
-                                            .requestFocus();
-                                      } else if (value.isNotEmpty &&
-                                          index == 3) {
-                                        _confirmFocusNodes[0]
-                                            .requestFocus(); // Jump to confirm row
-                                      }
-                                    },
+                            GestureDetector(
+                              onTap: () {
+                                _mpinFocusNode.requestFocus();
+                              },
+                              child: Stack(
+                                children: [
+                                  Opacity(
+                                    opacity: 0,
+                                    child: TextField(
+                                      controller: _mpinController,
+                                      focusNode: _mpinFocusNode,
+                                      keyboardType: TextInputType.number,
+                                      maxLength: 4,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      onChanged: (val) {
+                                        setState(() {});
+                                        if (val.length == 4) {
+                                          _confirmFocusNode.requestFocus();
+                                        }
+                                      },
+                                    ),
                                   ),
-                                );
-                              }),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: List.generate(4, (index) {
+                                      final bool isFocused =
+                                          _mpinFocusNode.hasFocus &&
+                                          _mpinController.text.length == index;
+                                      final bool hasText =
+                                          index < _mpinController.text.length;
+
+                                      return Container(
+                                        height: 52,
+                                        width: 52,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF4F6F9),
+                                          border: Border.all(
+                                            color: isFocused
+                                                ? accentTeal
+                                                : const Color(0xFFE5E9F2),
+                                            width: isFocused ? 2.0 : 1.5,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          hasText ? "•" : "",
+                                          style: const TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.bold,
+                                            color: darkText,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 24),
 
@@ -244,39 +264,73 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> with RouteAware {
                                   color: darkText),
                             ),
                             const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(4, (index) {
-                                return SizedBox(
-                                  height: 52,
-                                  width: 52,
-                                  child: TextField(
-                                    controller: _confirmControllers[index],
-                                    focusNode: _confirmFocusNodes[index],
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    obscureText: true,
-                                    maxLength: 1,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: darkText),
-                                    decoration: _getInputDecoration(accentTeal),
-                                    onChanged: (value) {
-                                      if (value.isNotEmpty && index < 3) {
-                                        _confirmFocusNodes[index + 1]
-                                            .requestFocus();
-                                      } else if (value.isEmpty && index > 0) {
-                                        _confirmFocusNodes[index - 1]
-                                            .requestFocus();
-                                      }
-                                    },
+                            GestureDetector(
+                              onTap: () {
+                                _confirmFocusNode.requestFocus();
+                              },
+                              child: Stack(
+                                children: [
+                                  Opacity(
+                                    opacity: 0,
+                                    child: TextField(
+                                      controller: _confirmController,
+                                      focusNode: _confirmFocusNode,
+                                      keyboardType: TextInputType.number,
+                                      maxLength: 4,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      onChanged: (val) {
+                                        setState(() {});
+                                        if (val.length == 4) {
+                                          context.read<MpinBloc>().add(
+                                                SetMpinSubmitted(
+                                                  mpin: _getMpin(),
+                                                  confirmMpin: _getConfirmMpin(),
+                                                ),
+                                              );
+                                        }
+                                      },
+                                    ),
                                   ),
-                                );
-                              }),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: List.generate(4, (index) {
+                                      final bool isFocused =
+                                          _confirmFocusNode.hasFocus &&
+                                          _confirmController.text.length == index;
+                                      final bool hasText =
+                                          index < _confirmController.text.length;
+
+                                      return Container(
+                                        height: 52,
+                                        width: 52,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF4F6F9),
+                                          border: Border.all(
+                                            color: isFocused
+                                                ? accentTeal
+                                                : const Color(0xFFE5E9F2),
+                                            width: isFocused ? 2.0 : 1.5,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          hasText ? "•" : "",
+                                          style: const TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.bold,
+                                            color: darkText,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 32),
 
@@ -349,7 +403,7 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> with RouteAware {
                             SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                "Secure • Encrypted • Official CURE ONE App",
+                                "Secure • Encrypted • Official CureOne App",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,

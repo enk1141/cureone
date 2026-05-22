@@ -13,11 +13,21 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final FocusNode _phoneFocusNode = FocusNode();
   // State variable to handle real-time validation locally or via bloc
   String? _validationError;
 
   @override
+  void initState() {
+    super.initState();
+    _phoneFocusNode.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
+    _phoneFocusNode.dispose();
     _phoneController.dispose();
     super.dispose();
   }
@@ -216,8 +226,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               borderRadius: BorderRadius.circular(16), //
                             ),
-                            child: Row(
-                              children: [
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15), //
+                              child: Row(
+                                children: [
                                 // Country Code
                                 Container(
                                   margin: const EdgeInsets.all(6), //
@@ -250,6 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 // Input Field
                                 Expanded(
                                   child: TextField(
+                                    focusNode: _phoneFocusNode,
                                     controller: _phoneController, //
                                     keyboardType: TextInputType.phone, //
                                     maxLength: 10, //
@@ -266,11 +279,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: darkText, //
                                     ),
                                     decoration: InputDecoration(
-                                      counterText: '', //
-                                      border: InputBorder.none, //
+                                      counterText: '',
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                              horizontal: 4), //
+                                              horizontal: 8, vertical: 11),
                                       hintText: "Enter mobile number", //
                                       hintStyle: TextStyle(
                                         color: Colors.grey.shade500, //
@@ -288,6 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             ),
+                            ), // Close ClipRRect
                           ),
                           if (_validationError != null) ...[
                             const SizedBox(height: 6),
@@ -317,18 +335,33 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 elevation: 0, //
                               ),
-                              // Button becomes disabled if there's an active validation format failure
                               onPressed: state is LoginLoading ||
                                       _validationError != null
                                   ? null
                                   : () {
-                                      if (_phoneController.text.trim().length ==
-                                          10) {
-                                        //
+                                      final text = _phoneController.text.trim();
+                                      if (text.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                "Please enter mobile number"),
+                                            backgroundColor: Colors.redAccent,
+                                          ),
+                                        );
+                                      } else if (text.length != 10) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                "Please enter a valid 10-digit mobile number"),
+                                            backgroundColor: Colors.redAccent,
+                                          ),
+                                        );
+                                      } else {
                                         context.read<LoginBloc>().add(
                                               LoginSubmitted(
-                                                //
-                                                _phoneController.text.trim(), //
+                                                text, //
                                               ),
                                             );
                                       }
@@ -403,7 +436,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Flexible(
                             //
                             child: Text(
-                              "Secure • Encrypted • Official CURE ONE App", //
+                              "Secure • Encrypted • Official CureOne App", //
                               style: TextStyle(
                                 fontWeight: FontWeight.w600, //
                                 fontSize: 12, //
