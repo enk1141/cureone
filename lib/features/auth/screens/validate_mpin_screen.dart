@@ -50,9 +50,15 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< Updated upstream
     const Color primaryTeal = Color(0xFF19B9B9);
     const Color accentTeal = Color(0xFF24BDBD);
     const Color darkText = Color(0xFF0B0B22);
+=======
+    Color primaryTeal = const Color(0xFF0653C7);
+    Color accentTeal = const Color(0xFF0653C7);
+    Color darkText = const Color(0xFF0653C7);
+>>>>>>> Stashed changes
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F9F9),
@@ -60,7 +66,7 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: darkText, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: darkText, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -122,7 +128,7 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       "CURE ONE",
                       style: TextStyle(
                         color: primaryTeal,
@@ -132,7 +138,7 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
-                    const Text(
+                    Text(
                       "Verify Your MPIN",
                       style: TextStyle(
                         fontSize: 20,
@@ -214,8 +220,47 @@ class _ValidateMpinScreenState extends State<ValidateMpinScreen> {
                                     },
                                   ),
                                 ),
+<<<<<<< Updated upstream
                               );
                             }),
+=======
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(4, (index) {
+                                    final bool isFocused =
+                                        _mpinFocusNode.hasFocus &&
+                                        _mpinController.text.length == index;
+                                    final bool hasText =
+                                        index < _mpinController.text.length;
+
+                                    return Container(
+                                      height: 60,
+                                      width: 60,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(
+                                          color: isFocused
+                                              ? accentTeal
+                                              : const Color(0xFFE5E9F2),
+                                          width: isFocused ? 2.0 : 1.5,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        hasText ? "•" : "",
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.w600,
+                                          color: darkText,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
+>>>>>>> Stashed changes
                           ),
                           const SizedBox(height: 32),
                           SizedBox(

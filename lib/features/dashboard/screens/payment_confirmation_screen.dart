@@ -176,7 +176,7 @@ class PaymentConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double subtotal = selectedBills.fold(0.0, (sum, item) => sum + (item['amount'] as double));
-    const double convenienceFee = 0.00;
+    double convenienceFee = 0.00;
     final double grandTotal = subtotal + convenienceFee;
 
     return Scaffold(

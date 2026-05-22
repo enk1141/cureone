@@ -30,9 +30,15 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< Updated upstream
     const Color primaryTeal = Color(0xFF19B9B9);
     const Color accentTeal = Color(0xFF24BDBD);
     const Color darkText = Colors.white;
+=======
+    Color primaryTeal = const Color(0xFF0653C7);
+    Color accentTeal = const Color(0xFF0653C7);
+    Color darkText = const Color(0xFF0653C7);
+>>>>>>> Stashed changes
 
     return BlocProvider<MpinBloc>(
       create: (context) => MpinBloc(),
@@ -97,7 +103,7 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text(
+                              Text(
                                 "CURE ONE",
                                 style: TextStyle(
                                   color: primaryTeal,
@@ -190,6 +196,7 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                                     color: Color(0xFF2D1F49),
                                                     width: 1.5,
                                                   ),
+<<<<<<< Updated upstream
                                                 ),
                                                 focusedBorder:
                                                     OutlineInputBorder(
@@ -198,6 +205,16 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                                   borderSide: const BorderSide(
                                                     color: accentTeal,
                                                     width: 2,
+=======
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    hasText ? "•" : "",
+                                                    style: TextStyle(
+                                                      fontSize: 28,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: darkText,
+                                                    ),
+>>>>>>> Stashed changes
                                                   ),
                                                 ),
                                                 contentPadding: EdgeInsets.zero,
@@ -239,7 +256,7 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                             tapTargetSize: MaterialTapTargetSize
                                                 .shrinkWrap,
                                           ),
-                                          child: const Text(
+                                          child: Text(
                                             "Forgot MPIN?",
                                             style: TextStyle(
                                               color: accentTeal,

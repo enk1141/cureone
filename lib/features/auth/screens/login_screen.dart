@@ -44,10 +44,17 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // Custom Color Palette
+<<<<<<< Updated upstream
     const Color primaryTeal = Color(0xFF19B9B9); //
     const Color accentTeal = Color(0xFF24BDBD); //
     const Color darkText = Colors.white; //
     const Color lightBg = Color(0xFF0F0720); //
+=======
+    Color primaryTeal = const Color(0xFF0653C7); //
+    Color accentTeal = const Color(0xFF0653C7); //
+    Color darkText = const Color(0xFF0653C7); //
+    Color lightBg = Colors.white; //
+>>>>>>> Stashed changes
 
     return Scaffold(
       backgroundColor: lightBg, //
@@ -109,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20), //
 
                     // App Name
-                    const Text(
+                    Text(
                       "CURE ONE", //
                       style: TextStyle(
                         color: primaryTeal, //
@@ -163,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment:
                                 MainAxisAlignment.spaceBetween, //
                             children: [
-                              const Text(
+                              Text(
                                 "Mobile Number", //
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700, //
@@ -259,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
 
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16, //
                                       fontWeight: FontWeight.w600, //
                                       letterSpacing: 0.5, //

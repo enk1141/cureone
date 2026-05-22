@@ -486,31 +486,70 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
+<<<<<<< Updated upstream
                   "$totalCount items selected",
                   style: const TextStyle(
                     color: Color(0xFF8A9A9A),
+=======
+                  '$selectedCount of $totalCount selected',
+                  style: TextStyle(
+>>>>>>> Stashed changes
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
+<<<<<<< Updated upstream
                   "₹${totalAmount.toStringAsFixed(2)}",
                   style: const TextStyle(
                     color: Color(0xFF19B9B9),
                     fontSize: 18,
+=======
+                  '₹${totalAmount.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 20,
+>>>>>>> Stashed changes
                     fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
             ),
           ),
+<<<<<<< Updated upstream
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF19B9B9),
               disabledBackgroundColor: const Color(0xFF19B9B9).withOpacity(0.2),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
+=======
+          TextButton.icon(
+            onPressed: totalCount == 0 ? null : onSelectAll,
+            icon: Icon(
+              allSelected
+                  ? Icons.remove_done_rounded
+                  : Icons.done_all_rounded,
+              size: 16,
+              color: AppColors.primary,
+            ),
+            label: Text(
+              allSelected ? 'Clear all' : 'Select all',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.surface,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadii.pill),
+                side: BorderSide(color: AppColors.border),
+>>>>>>> Stashed changes
               ),
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
               elevation: hasSelection ? 8 : 0,
@@ -552,3 +591,382 @@ class _PayAllAtOnceScreenState extends State<PayAllAtOnceScreen> {
     );
   }
 }
+<<<<<<< Updated upstream
+=======
+
+class _CategoryGroup extends StatelessWidget {
+  const _CategoryGroup({required this.category, required this.bills});
+
+  final UtilityCategory category;
+  final List<Map<String, dynamic>> bills;
+
+  @override
+  Widget build(BuildContext context) {
+    final allSelected = bills.every((b) => b['isSelected'] as bool);
+    final someSelected =
+        bills.any((b) => b['isSelected'] as bool) && !allSelected;
+    final categoryTotal = bills
+        .where((b) => b['isSelected'] as bool)
+        .fold<double>(0.0, (s, b) => s + (b['amount'] as num).toDouble());
+
+    return AppCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Category header with select-all toggle
+          InkWell(
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppRadii.lg),
+            ),
+            onTap: () {
+              context.read<DashboardBloc>().add(
+                    ToggleCategoryBillsSelection(
+                      category: category.key,
+                      isSelected: !allSelected,
+                    ),
+                  );
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+              child: Row(
+                children: [
+                  Container(
+                    height: 34,
+                    width: 34,
+                    decoration: BoxDecoration(
+                      color: category.color.withOpacity(0.14),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(category.icon,
+                        color: category.color, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          category.label,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${bills.length} bill${bills.length == 1 ? '' : 's'}'
+                          '${categoryTotal > 0 ? ' · ₹${categoryTotal.toStringAsFixed(0)} selected' : ''}',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _TriCheckbox(
+                    allSelected: allSelected,
+                    someSelected: someSelected,
+                    color: category.color,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Divider
+          Container(height: 1, color: AppColors.border),
+          // Bills under this category
+          ...bills.asMap().entries.map((entry) {
+            final i = entry.key;
+            final bill = entry.value;
+            return _BillRow(
+              bill: bill,
+              category: category,
+              isLast: i == bills.length - 1,
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _BillRow extends StatelessWidget {
+  const _BillRow({
+    required this.bill,
+    required this.category,
+    required this.isLast,
+  });
+
+  final Map<String, dynamic> bill;
+  final UtilityCategory category;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = bill['isSelected'] as bool;
+    final amount = (bill['amount'] as num).toDouble();
+    final due = bill['dueDate'] as String? ?? '';
+    final isExpired = due.toLowerCase().contains('expired');
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: isLast
+            ? const BorderRadius.vertical(
+                bottom: Radius.circular(AppRadii.lg),
+              )
+            : BorderRadius.zero,
+        onTap: () {
+          context.read<DashboardBloc>().add(
+                ToggleBillSelection(id: bill['id'] as String),
+              );
+        },
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          decoration: BoxDecoration(
+            border: isLast
+                ? null
+                : Border(
+                    bottom:
+                        BorderSide(color: AppColors.border, width: 0.8),
+                  ),
+          ),
+          child: Row(
+            children: [
+              _Check(checked: selected, color: category.color),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      bill['name'] as String,
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          'ID: ${bill['id']}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 3,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: AppColors.textMuted,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          isExpired
+                              ? Icons.error_outline_rounded
+                              : Icons.schedule_rounded,
+                          size: 11,
+                          color: isExpired
+                              ? AppColors.danger
+                              : AppColors.textMuted,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          due,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isExpired
+                                ? AppColors.danger
+                                : AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '₹${amount.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: selected ? category.color : AppColors.primaryDark,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Check extends StatelessWidget {
+  const _Check({required this.checked, required this.color});
+  final bool checked;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 22,
+      width: 22,
+      decoration: BoxDecoration(
+        color: checked ? color : AppColors.surface,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: checked ? color : AppColors.border,
+          width: 1.5,
+        ),
+      ),
+      child: checked
+          ? const Icon(Icons.check_rounded, size: 14, color: Colors.white)
+          : null,
+    );
+  }
+}
+
+class _TriCheckbox extends StatelessWidget {
+  const _TriCheckbox({
+    required this.allSelected,
+    required this.someSelected,
+    required this.color,
+  });
+
+  final bool allSelected;
+  final bool someSelected;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final filled = allSelected || someSelected;
+    return Container(
+      height: 22,
+      width: 22,
+      decoration: BoxDecoration(
+        color: filled ? color : AppColors.surface,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: filled ? color : AppColors.border,
+          width: 1.5,
+        ),
+      ),
+      child: allSelected
+          ? const Icon(Icons.check_rounded, size: 14, color: Colors.white)
+          : someSelected
+              ? const Icon(Icons.remove_rounded, size: 14, color: Colors.white)
+              : null,
+    );
+  }
+}
+
+class _PayBar extends StatelessWidget {
+  const _PayBar({
+    required this.selectedCount,
+    required this.totalAmount,
+    required this.onPay,
+  });
+
+  final int selectedCount;
+  final double totalAmount;
+  final VoidCallback onPay;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = selectedCount > 0;
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+          20, 12, 20, 12 + MediaQuery.of(context).padding.bottom),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.border)),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: ElevatedButton(
+          onPressed: enabled ? onPay : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            disabledBackgroundColor: AppColors.border,
+            disabledForegroundColor: AppColors.textMuted,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.lock_outline_rounded, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                enabled
+                    ? 'Pay ₹${totalAmount.toStringAsFixed(2)} ($selectedCount)'
+                    : 'Select bills to pay',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AllPaidState extends StatelessWidget {
+  const _AllPaidState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 84,
+              width: 84,
+              decoration: BoxDecoration(
+                color: AppColors.success.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.check_rounded,
+                  size: 42, color: AppColors.success),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'All caught up!',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primaryDark,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'You have no pending bills.',
+              textAlign: TextAlign.center,
+              style: AppText.bodyMuted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+>>>>>>> Stashed changes

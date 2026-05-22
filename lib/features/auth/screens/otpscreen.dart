@@ -37,10 +37,17 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     // Exact matching palette from login screen
+<<<<<<< Updated upstream
     const Color primaryTeal = Color(0xFF19B9B9);
     const Color accentTeal = Color(0xFF24BDBD);
     const Color darkText = Colors.white;
     const Color lightBg = Color(0xFF0F0720);
+=======
+    Color primaryTeal = const Color(0xFF0653C7);
+    Color accentTeal = const Color(0xFF0653C7);
+    Color darkText = const Color(0xFF0653C7);
+    Color lightBg = Colors.white;
+>>>>>>> Stashed changes
 
     return Scaffold(
       backgroundColor: lightBg,
@@ -97,7 +104,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      const Text(
+                      Text(
                         "CURE ONE",
                         style: TextStyle(
                           color: primaryTeal,
@@ -211,8 +218,51 @@ class _OtpScreenState extends State<OtpScreen> {
                                       },
                                     ),
                                   ),
+<<<<<<< Updated upstream
                                 );
                               }),
+=======
+                                  // Visual Boxes
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: List.generate(6, (index) {
+                                      final bool isFocused =
+                                          _otpFocusNode.hasFocus &&
+                                          _otpController.text.length == index;
+                                      final bool hasText =
+                                          index < _otpController.text.length;
+                                          
+                                      return Container(
+                                        height: 52,
+                                        width: 44,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF4F6F9),
+                                          border: Border.all(
+                                            color: isFocused
+                                                ? accentTeal
+                                                : const Color(0xFFE5E9F2),
+                                            width: isFocused ? 2.0 : 1.5,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          hasText
+                                              ? _otpController.text[index]
+                                              : "",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: darkText,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
+>>>>>>> Stashed changes
                             ),
                             const SizedBox(height: 28),
 
@@ -278,7 +328,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: Size.zero),
-                                  child: const Text(
+                                  child: Text(
                                     "Resend",
                                     style: TextStyle(
                                         color: accentTeal,

@@ -484,6 +484,7 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
     final bool hasSelection = totalCount > 0;
 
     return Container(
+<<<<<<< Updated upstream
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: const BoxDecoration(
         color: Color(0xFF1E1435),
@@ -493,11 +494,19 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
+=======
+      decoration: BoxDecoration(
+        gradient: AppGradients.brand,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+>>>>>>> Stashed changes
         ),
       ),
       child: Row(
         children: [
           Expanded(
+<<<<<<< Updated upstream
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -520,6 +529,15 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
                   ),
                 ),
               ],
+=======
+            child: Text(
+              '$selectedCount of $totalCount selected',
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textMuted,
+              ),
+>>>>>>> Stashed changes
             ),
           ),
           ElevatedButton(
@@ -569,3 +587,305 @@ class _UtilityDetailsScreenState extends State<UtilityDetailsScreen> {
     );
   }
 }
+<<<<<<< Updated upstream
+=======
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bill tile
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _BillTile extends StatelessWidget {
+  const _BillTile({
+    required this.bill,
+    required this.category,
+    required this.onToggle,
+  });
+
+  final Map<String, dynamic> bill;
+  final UtilityCategory category;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = bill['isSelected'] as bool;
+    final amount = (bill['amount'] as num).toDouble();
+    final due = bill['dueDate'] as String? ?? '';
+    final isExpired = due.toLowerCase().contains('expired');
+    final isUrgent =
+        due.contains('2 days') || due.contains('5 days');
+    final isPaid = (bill['isPaid'] as bool?) ?? false;
+
+    return PressableScale(
+      onTap: isPaid ? () {} : onToggle,
+      child: TintedCard(
+        tint: category.color,
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            _Check(selected: selected, color: category.color, paid: isPaid),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          bill['name'] as String,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                      ),
+                      if (isPaid)
+                        StatusChip(
+                            label: 'PAID', color: AppColors.success),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'ID: ${bill['id']}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(
+                        isExpired
+                            ? Icons.error_outline_rounded
+                            : Icons.schedule_rounded,
+                        size: 12,
+                        color: isExpired
+                            ? AppColors.danger
+                            : isUrgent
+                                ? AppColors.warning
+                                : AppColors.textMuted,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        due,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isExpired
+                              ? AppColors.danger
+                              : isUrgent
+                                  ? AppColors.warning
+                                  : AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              '₹${amount.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                color: selected ? category.color : AppColors.primaryDark,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Check extends StatelessWidget {
+  const _Check({
+    required this.selected,
+    required this.color,
+    required this.paid,
+  });
+  final bool selected;
+  final Color color;
+  final bool paid;
+
+  @override
+  Widget build(BuildContext context) {
+    if (paid) {
+      return Container(
+        height: 22,
+        width: 22,
+        decoration: BoxDecoration(
+          color: AppColors.success,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: const Icon(Icons.check_rounded, size: 14, color: Colors.white),
+      );
+    }
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      height: 22,
+      width: 22,
+      decoration: BoxDecoration(
+        color: selected ? color : Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: selected ? color : AppColors.border,
+          width: 1.5,
+        ),
+      ),
+      child: selected
+          ? const Icon(Icons.check_rounded, size: 14, color: Colors.white)
+          : null,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bottom pay bar
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PayBar extends StatelessWidget {
+  const _PayBar({
+    required this.count,
+    required this.total,
+    required this.tint,
+    required this.onPay,
+  });
+
+  final int count;
+  final double total;
+  final Color tint;
+  final VoidCallback onPay;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+          20, 12, 20, 12 + MediaQuery.of(context).padding.bottom),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.border)),
+        boxShadow: [
+          BoxShadow(
+            color: tint.withOpacity(0.10),
+            blurRadius: 24,
+            offset: const Offset(0, -6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$count selected',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '₹${total.toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: tint,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          SizedBox(
+            height: 50,
+            child: ElevatedButton.icon(
+              onPressed: onPay,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: tint,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+              ),
+              icon:
+                  const Icon(Icons.lock_outline_rounded, size: 16),
+              label: const Text(
+                'Pay Now',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Empty state
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.category});
+  final UtilityCategory category;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 92,
+              width: 92,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: category.color.withOpacity(0.30),
+                    blurRadius: 22,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Icon(category.icon, color: category.color, size: 46),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'No ${category.label.toLowerCase()} yet',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primaryDark,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Tap "+ Add Utility" to register your first bill.',
+              textAlign: TextAlign.center,
+              style: AppText.bodyMuted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+>>>>>>> Stashed changes

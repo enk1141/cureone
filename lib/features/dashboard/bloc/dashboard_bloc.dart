@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'dashboard_event.dart';
 part 'dashboard_state.dart';
 
-const List<Map<String, dynamic>> _initialBills = [
+List<Map<String, dynamic>> _initialBills = [
   {"title": "Electricity", "type": "electricity"},
   {"title": "HMWSSB", "type": "hmwssb"},
   {"title": "Property Tax", "type": "property_tax"},
@@ -10,7 +10,7 @@ const List<Map<String, dynamic>> _initialBills = [
   {"title": "eChallan", "type": "echallan"},
 ];
 
-const List<Map<String, dynamic>> _initialUtilityBills = [
+List<Map<String, dynamic>> _initialUtilityBills = [
   // Electricity
   {"id": "ELE-98723", "name": "Main Residence", "amount": 2450.00, "category": "electricity", "dueDate": "Due in 5 days", "isSelected": true},
   {"id": "ELE-10283", "name": "Commercial Shop", "amount": 5120.50, "category": "electricity", "dueDate": "Due in 10 days", "isSelected": false},

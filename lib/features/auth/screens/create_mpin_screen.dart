@@ -45,10 +45,17 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< Updated upstream
     const Color primaryTeal = Color(0xFF19B9B9);
     const Color accentTeal = Color(0xFF24BDBD);
     const Color darkText = Colors.white;
     const Color lightBg = Color(0xFF0F0720);
+=======
+    Color primaryTeal = const Color(0xFF0653C7);
+    Color accentTeal = const Color(0xFF0653C7);
+    Color darkText = const Color(0xFF0653C7);
+    Color lightBg = Colors.white;
+>>>>>>> Stashed changes
 
     return Scaffold(
       backgroundColor: lightBg,
@@ -69,8 +76,8 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                 _confirmFocusNodes[0].requestFocus();
               } else if (state is MpinSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("MPIN Created! Now verify it."),
+                  SnackBar(
+                    content: const Text("MPIN Created! Now verify it."),
                     backgroundColor: primaryTeal,
                   ),
                 );
@@ -113,7 +120,7 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      const Text(
+                      Text(
                         "CURE ONE",
                         style: TextStyle(
                           color: primaryTeal,
@@ -158,7 +165,7 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // ROW 1: Create MPIN
-                            const Text(
+                            Text(
                               "Enter 4-Digit MPIN",
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -202,13 +209,54 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                                       }
                                     },
                                   ),
+<<<<<<< Updated upstream
                                 );
                               }),
+=======
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: List.generate(4, (index) {
+                                      final bool isFocused =
+                                          _mpinFocusNode.hasFocus &&
+                                          _mpinController.text.length == index;
+                                      final bool hasText =
+                                          index < _mpinController.text.length;
+
+                                      return Container(
+                                        height: 52,
+                                        width: 52,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF4F6F9),
+                                          border: Border.all(
+                                            color: isFocused
+                                                ? accentTeal
+                                                : const Color(0xFFE5E9F2),
+                                            width: isFocused ? 2.0 : 1.5,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          hasText ? "•" : "",
+                                          style: TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.bold,
+                                            color: darkText,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
+>>>>>>> Stashed changes
                             ),
                             const SizedBox(height: 24),
 
                             // ROW 2: Re-enter MPIN
-                            const Text(
+                            Text(
                               "Confirm 4-Digit MPIN",
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -247,8 +295,49 @@ class _CreateMpinScreenState extends State<CreateMpinScreen> {
                                       }
                                     },
                                   ),
+<<<<<<< Updated upstream
                                 );
                               }),
+=======
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: List.generate(4, (index) {
+                                      final bool isFocused =
+                                          _confirmFocusNode.hasFocus &&
+                                          _confirmController.text.length == index;
+                                      final bool hasText =
+                                          index < _confirmController.text.length;
+
+                                      return Container(
+                                        height: 52,
+                                        width: 52,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF4F6F9),
+                                          border: Border.all(
+                                            color: isFocused
+                                                ? accentTeal
+                                                : const Color(0xFFE5E9F2),
+                                            width: isFocused ? 2.0 : 1.5,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          hasText ? "•" : "",
+                                          style: TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.bold,
+                                            color: darkText,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
+>>>>>>> Stashed changes
                             ),
                             const SizedBox(height: 32),
 
