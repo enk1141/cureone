@@ -45,6 +45,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               .toList();
           final totalDue = pending.fold<double>(
               0.0, (s, b) => s + (b['amount'] as num).toDouble());
+          final electricityCount = state.utilityBills
+              .where((b) =>
+                  !((b['isPaid'] as bool?) ?? false) &&
+                  b['category'] == 'electricity')
+              .length;
 
           return SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -62,18 +67,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       FadeSlideIn(
                         delay: const Duration(milliseconds: 120),
                         child: _OverlaySummary(
-                          pending: pending.length,
-                          paid: paid.length,
-                          taxDue: state.utilityBills
+                          electricityDue: state.utilityBills
                               .where((b) =>
                                   !((b['isPaid'] as bool?) ?? false) &&
-                                  (b['category'] == 'property_tax' ||
-                                      b['category'] == 'trade'))
+                                  b['category'] == 'electricity')
                               .fold<double>(
                                   0.0,
                                   (s, b) =>
                                       s + (b['amount'] as num).toDouble()),
-                          totalDue: totalDue,
+                          tradeDue: state.utilityBills
+                              .where((b) =>
+                                  !((b['isPaid'] as bool?) ?? false) &&
+                                  b['category'] == 'trade')
+                              .fold<double>(
+                                  0.0,
+                                  (s, b) =>
+                                      s + (b['amount'] as num).toDouble()),
+                          taxDue: state.utilityBills
+                              .where((b) =>
+                                  !((b['isPaid'] as bool?) ?? false) &&
+                                  b['category'] == 'property_tax')
+                              .fold<double>(
+                                  0.0,
+                                  (s, b) =>
+                                      s + (b['amount'] as num).toDouble()),
+                          echallanDue: state.utilityBills
+                              .where((b) =>
+                                  !((b['isPaid'] as bool?) ?? false) &&
+                                  b['category'] == 'echallan')
+                              .fold<double>(
+                                  0.0,
+                                  (s, b) =>
+                                      s + (b['amount'] as num).toDouble()),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -81,7 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         delay: Duration(milliseconds: 200),
                         child: _QuickActions(),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       FadeSlideIn(
                         delay: const Duration(milliseconds: 280),
                         child: _BannerCarousel(
@@ -89,12 +114,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           onChange: (i) => setState(() => _banner = i),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 20),
                       FadeSlideIn(
                         delay: const Duration(milliseconds: 360),
                         child: _ServicesSection(bills: state.bills),
                       ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 8),
                       const FadeSlideIn(
                         delay: Duration(milliseconds: 440),
                         child: _RecentActivity(),
@@ -149,8 +174,7 @@ class _HeroHeader extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white.withOpacity(0.16),
-                      border:
-                          Border.all(color: Colors.white.withOpacity(0.35)),
+                      border: Border.all(color: Colors.white.withOpacity(0.35)),
                     ),
                     child: const Icon(Icons.person_rounded,
                         color: Colors.white, size: 22),
@@ -188,31 +212,31 @@ class _HeroHeader extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 26),
-              Text(
-                'Total due this month',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.78),
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.4,
-                ),
-              ),
+              // Text(
+              //   'Total due this month',
+              //   style: TextStyle(
+              //     color: Colors.white.withOpacity(0.78),
+              //     fontSize: 12.5,
+              //     fontWeight: FontWeight.w600,
+              //     letterSpacing: 0.4,
+              //   ),
+              // ),
               const SizedBox(height: 6),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  AnimatedCounter(
-                    value: totalDue,
-                    prefix: '₹',
-                    format: _format,
-                    duration: const Duration(milliseconds: 1100),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
+                  // AnimatedCounter(
+                  //   value: totalDue,
+                  //   prefix: '₹',
+                  //   format: _format,
+                  //   duration: const Duration(milliseconds: 1100),
+                  //   style: const TextStyle(
+                  //     color: Colors.white,
+                  //     fontSize: 34,
+                  //     fontWeight: FontWeight.w900,
+                  //     letterSpacing: -0.5,
+                  //   ),
+                  // ),
                   const SizedBox(width: 10),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
@@ -224,10 +248,10 @@ class _HeroHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppRadii.pill),
                       ),
                       child: Text(
-                        '$pendingCount pending',
+                        'Pay Your Bills',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 11,
+                          fontSize: 16,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -322,16 +346,16 @@ class _CircleIconButton extends StatelessWidget {
 
 class _OverlaySummary extends StatelessWidget {
   const _OverlaySummary({
-    required this.pending,
-    required this.paid,
+    required this.electricityDue,
+    required this.tradeDue,
     required this.taxDue,
-    required this.totalDue,
+    required this.echallanDue,
   });
 
-  final int pending;
-  final int paid;
+  final double electricityDue;
+  final double tradeDue;
   final double taxDue;
-  final double totalDue;
+  final double echallanDue;
 
   @override
   Widget build(BuildContext context) {
@@ -349,31 +373,31 @@ class _OverlaySummary extends StatelessWidget {
         child: Row(
           children: [
             _stat(
-              icon: Icons.schedule_rounded,
-              label: 'Pending',
-              value: '$pending',
-              color: AppColors.warning,
+              icon: Icons.bolt_rounded,
+              label: 'Electricity',
+              value: '3',
+              color: AppColors.catElectricity,
             ),
             _divider(),
             _stat(
-              icon: Icons.check_circle_rounded,
-              label: 'Paid',
-              value: '$paid',
-              color: AppColors.success,
+              icon: Icons.storefront_rounded,
+              label: 'Trade',
+              value: '2',
+              color: AppColors.catTrade,
             ),
             _divider(),
             _stat(
               icon: Icons.account_balance_rounded,
               label: 'Tax',
-              value: '₹${_compact(taxDue)}',
+              value: '1',
               color: AppColors.catPropertyTax,
             ),
             _divider(),
             _stat(
-              icon: Icons.currency_rupee_rounded,
-              label: 'Amount',
-              value: '₹${_compact(totalDue)}',
-              color: AppColors.primary,
+              icon: Icons.receipt_long_rounded,
+              label: 'eChallan',
+              value: '1',
+              color: AppColors.catEChallan,
             ),
           ],
         ),
@@ -483,8 +507,7 @@ class _QuickActions extends StatelessWidget {
         icon: Icons.history_rounded,
         label: 'History',
         color: AppColors.catTrade,
-        onTap: () =>
-            Navigator.pushNamed(context, AppRoutes.paymentHistory),
+        onTap: () => Navigator.pushNamed(context, AppRoutes.paymentHistory),
       ),
       _QuickAction(
         icon: Icons.support_agent_rounded,
@@ -706,8 +729,7 @@ class _BannerCard extends StatelessWidget {
                     errorBuilder: (_, __, ___) => Container(
                       color: banner.color.withOpacity(0.10),
                       alignment: Alignment.center,
-                      child: Icon(banner.icon,
-                          color: banner.color, size: 48),
+                      child: Icon(banner.icon, color: banner.color, size: 48),
                     ),
                   ),
                 ),
@@ -735,8 +757,7 @@ class _BannerCard extends StatelessWidget {
               ),
               // Content on the left.
               Padding(
-                padding:
-                    const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
                 child: Row(
                   children: [
                     Expanded(
@@ -857,7 +878,7 @@ class _ServicesSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           if (bills.isEmpty)
             const Center(
               child: Padding(
@@ -870,8 +891,7 @@ class _ServicesSection extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: bills.length,
-              gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
@@ -879,8 +899,7 @@ class _ServicesSection extends StatelessWidget {
               ),
               itemBuilder: (context, i) {
                 final bill = bills[i];
-                final cat =
-                    UtilityCategory.fromKey(bill['type'] as String);
+                final cat = UtilityCategory.fromKey(bill['type'] as String);
                 return TintedCard(
                   tint: cat.color,
                   elevated: true,
@@ -906,8 +925,7 @@ class _ServicesSection extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: AppShadows.tile(cat.color),
                         ),
-                        child:
-                            Icon(cat.icon, color: cat.color, size: 22),
+                        child: Icon(cat.icon, color: cat.color, size: 22),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -961,8 +979,8 @@ class _RecentActivity extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                    context, AppRoutes.paymentHistory),
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRoutes.paymentHistory),
                 child: const Row(
                   children: [
                     Text(
@@ -999,8 +1017,8 @@ class _RecentActivity extends StatelessWidget {
                     r.bills.first['category'] as String);
                 final isMulti = r.bills.length > 1;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   child: Row(
                     children: [
                       Container(
@@ -1010,8 +1028,7 @@ class _RecentActivity extends StatelessWidget {
                           color: cat.color.withOpacity(0.14),
                           shape: BoxShape.circle,
                         ),
-                        child:
-                            Icon(cat.icon, color: cat.color, size: 18),
+                        child: Icon(cat.icon, color: cat.color, size: 18),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1061,8 +1078,18 @@ class _RecentActivity extends StatelessWidget {
 
   String _fmt(DateTime d) {
     const m = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     return '${d.day.toString().padLeft(2, '0')} ${m[d.month - 1]}';
   }
