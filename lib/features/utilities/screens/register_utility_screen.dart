@@ -101,42 +101,36 @@ class _RegisterUtilityScreenState extends State<RegisterUtilityScreen> {
       backgroundColor: AppColors.surface,
       body: Column(
         children: [
+          FadeSlideIn(
+            offset: const Offset(0, -18),
+            child: _Hero(step: _step, onBack: _back),
+          ),
           Expanded(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  FadeSlideIn(
-                    offset: const Offset(0, -18),
-                    child: _Hero(step: _step, onBack: _back),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 280),
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0.12, 0),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutCubic,
+                    )),
+                    child: child,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 280),
-                      transitionBuilder: (child, animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0.12, 0),
-                              end: Offset.zero,
-                            ).animate(CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
-                            )),
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: KeyedSubtree(
-                        key: ValueKey(_step),
-                        child: _buildStep(),
-                      ),
-                    ),
-                  ),
-                ],
+                );
+              },
+              child: KeyedSubtree(
+                key: ValueKey(_step),
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                  child: _buildStep(),
+                ),
               ),
             ),
           ),
@@ -215,14 +209,14 @@ class _Hero extends StatelessWidget {
       decoration: const BoxDecoration(
         gradient: AppGradients.brand,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
       ),
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -236,7 +230,7 @@ class _Hero extends StatelessWidget {
                   _StepDots(current: step),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 22),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 240),
                 child: Text(
@@ -244,13 +238,13 @@ class _Hero extends StatelessWidget {
                   key: ValueKey('title-$step'),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.2,
                   ),
                 ),
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 6),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 240),
                 child: Text(
@@ -258,7 +252,7 @@ class _Hero extends StatelessWidget {
                   key: ValueKey('sub-$step'),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.80),
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -282,14 +276,14 @@ class _CircleButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadii.pill),
       onTap: onTap,
       child: Container(
-        height: 34,
-        width: 34,
+        height: 40,
+        width: 40,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.16),
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white.withOpacity(0.32)),
         ),
-        child: Icon(icon, color: Colors.white, size: 16),
+        child: Icon(icon, color: Colors.white, size: 18),
       ),
     );
   }
@@ -405,8 +399,8 @@ class _StepPickType extends StatelessWidget {
             return PressableScale(
               onTap: () => onSelect(item.category),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -575,13 +569,11 @@ class _StepCan extends StatelessWidget {
       children: [
         // Selected-category indicator
         Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppRadii.lg),
-            border:
-                Border.all(color: category.color.withOpacity(0.18)),
+            border: Border.all(color: category.color.withOpacity(0.18)),
             boxShadow: [
               BoxShadow(
                 color: category.color.withOpacity(0.20),
@@ -612,8 +604,7 @@ class _StepCan extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(Icons.check_circle_rounded,
-                  color: category.color, size: 20),
+              Icon(Icons.check_circle_rounded, color: category.color, size: 20),
             ],
           ),
         ),
@@ -648,12 +639,11 @@ class _StepCan extends StatelessWidget {
               letterSpacing: 0.5,
               fontWeight: FontWeight.w500,
             ),
-            prefixIcon: Icon(Icons.tag_rounded,
-                color: category.color, size: 20),
+            prefixIcon:
+                Icon(Icons.tag_rounded, color: category.color, size: 20),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadii.md),
-              borderSide:
-                  BorderSide(color: category.color.withOpacity(0.20)),
+              borderSide: BorderSide(color: category.color.withOpacity(0.20)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadii.md),
@@ -671,8 +661,7 @@ class _StepCan extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(Icons.info_outline_rounded,
-                  color: category.color, size: 16),
+              Icon(Icons.info_outline_rounded, color: category.color, size: 16),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -750,8 +739,7 @@ class _StepOtpState extends State<_StepOtp> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppRadii.lg),
@@ -773,8 +761,7 @@ class _StepOtpState extends State<_StepOtp> {
                   color: widget.tint.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.sms_rounded,
-                    color: widget.tint, size: 18),
+                child: Icon(Icons.sms_rounded, color: widget.tint, size: 18),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -832,8 +819,7 @@ class _StepOtpState extends State<_StepOtp> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.md),
-                    borderSide:
-                        BorderSide(color: widget.tint, width: 1.8),
+                    borderSide: BorderSide(color: widget.tint, width: 1.8),
                   ),
                 ),
                 onChanged: (v) {
@@ -861,8 +847,8 @@ class _StepOtpState extends State<_StepOtp> {
                 )
               : TextButton.icon(
                   onPressed: _startTimer,
-                  icon: Icon(Icons.refresh_rounded,
-                      size: 16, color: widget.tint),
+                  icon:
+                      Icon(Icons.refresh_rounded, size: 16, color: widget.tint),
                   label: Text(
                     'Resend OTP',
                     style: TextStyle(
@@ -939,14 +925,3 @@ class _BottomBar extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-

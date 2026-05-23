@@ -1,4 +1,4 @@
-import 'package:carousel_slider/carousel_slider.dart';
+// import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/config/app_theme.dart';
@@ -78,19 +78,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: _QuickActions(),
                       ),
                       const SizedBox(height: 16),
-                      FadeSlideIn(
-                        delay: const Duration(milliseconds: 280),
-                        child: _BannerCarousel(
-                          current: _banner,
-                          onChange: (i) => setState(() => _banner = i),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      // FadeSlideIn(
+                      //   delay: const Duration(milliseconds: 280),
+                      //   child: _BannerCarousel(
+                      //     current: _banner,
+                      //     onChange: (i) => setState(() => _banner = i),
+                      //   ),
+                      // ),
+                      const SizedBox(height: 10),
                       FadeSlideIn(
                         delay: const Duration(milliseconds: 360),
                         child: _ServicesSection(bills: state.bills),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       const FadeSlideIn(
                         delay: Duration(milliseconds: 440),
                         child: _RecentActivity(),
@@ -354,75 +354,74 @@ class _OverlaySummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFBFCFE),
-          borderRadius: BorderRadius.circular(AppRadii.xl),
-          border: Border.all(color: AppColors.border),
-          boxShadow: AppShadows.soft,
-        ),
-        child: Row(
-          children: [
-            _stat(
-              label: 'Utilities',
-              value: '$utilitiesCount',
-              color: AppColors.primary,
-            ),
-            _divider(),
-            _stat(
-              label: 'Due Bills',
-              value: '$dueCount',
-              color: AppColors.danger,
-            ),
-            _divider(),
-            _stat(
-              label: 'Paid',
-              value: '$paidCount',
-              color: AppColors.success,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _stat({
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              color: color,
-            ),
+          _card(
+            label: 'Utilities',
+            value: '$utilitiesCount',
+            color: AppColors.primary,
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textMuted,
-            ),
+          const SizedBox(width: 10),
+          _card(
+            label: 'Due Bills',
+            value: '$dueCount',
+            color: AppColors.danger,
+          ),
+          const SizedBox(width: 10),
+          _card(
+            label: 'Paid',
+            value: '$paidCount',
+            color: AppColors.success,
           ),
         ],
       ),
     );
   }
 
-  Widget _divider() {
-    return Container(
-      height: 32,
-      width: 1,
-      color: AppColors.border,
+  Widget _card({
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFBFCFE),
+          borderRadius: BorderRadius.circular(16),
+          // border: Border.all(color: AppColors.border),
+          boxShadow: AppShadows.soft,
+
+          border: Border(
+            left: BorderSide(
+              color: color,
+              width: 6, // 👉 increase to 5 or 6 if you want thicker
+            ),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -539,248 +538,248 @@ class _QuickActionTile extends StatelessWidget {
 // Banner carousel
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _BannerCarousel extends StatelessWidget {
-  const _BannerCarousel({required this.current, required this.onChange});
+// class _BannerCarousel extends StatelessWidget {
+//   const _BannerCarousel({required this.current, required this.onChange});
 
-  final int current;
-  final ValueChanged<int> onChange;
+//   final int current;
+//   final ValueChanged<int> onChange;
 
-  @override
-  Widget build(BuildContext context) {
-    final banners = <_Banner>[
-      _Banner(
-        title: 'Pay Property Tax',
-        subtitle: 'Save up to 5% rebate on early payment',
-        badge: '5% REBATE',
-        color: AppColors.catPropertyTax,
-        icon: Icons.home_work_rounded,
-        asset: 'assets/property_tax_photo.png',
-      ),
-      _Banner(
-        title: 'Pay Electricity',
-        subtitle: 'Quick, secure, zero processing fee',
-        badge: 'ZERO FEE',
-        color: AppColors.catElectricity,
-        icon: Icons.bolt_rounded,
-        asset: 'assets/electricity_photo.png',
-      ),
-      _Banner(
-        title: 'Water Bill',
-        subtitle: '24/7 HMWSSB online payments',
-        badge: '24/7',
-        color: AppColors.catWater,
-        icon: Icons.water_drop_rounded,
-        asset: 'assets/water_bill_photo.png',
-      ),
-      _Banner(
-        title: 'eChallan',
-        subtitle: 'Clear traffic challans in seconds',
-        badge: 'NEW',
-        color: AppColors.catEChallan,
-        icon: Icons.receipt_long_rounded,
-        asset: 'assets/echallan_photo.png',
-      ),
-    ];
+//   @override
+//   Widget build(BuildContext context) {
+//     final banners = <_Banner>[
+//       _Banner(
+//         title: 'Pay Property Tax',
+//         subtitle: 'Save up to 5% rebate on early payment',
+//         badge: '5% REBATE',
+//         color: AppColors.catPropertyTax,
+//         icon: Icons.home_work_rounded,
+//         asset: 'assets/property_tax_photo.png',
+//       ),
+//       _Banner(
+//         title: 'Pay Electricity',
+//         subtitle: 'Quick, secure, zero processing fee',
+//         badge: 'ZERO FEE',
+//         color: AppColors.catElectricity,
+//         icon: Icons.bolt_rounded,
+//         asset: 'assets/electricity_photo.png',
+//       ),
+//       _Banner(
+//         title: 'Water Bill',
+//         subtitle: '24/7 HMWSSB online payments',
+//         badge: '24/7',
+//         color: AppColors.catWater,
+//         icon: Icons.water_drop_rounded,
+//         asset: 'assets/water_bill_photo.png',
+//       ),
+//       _Banner(
+//         title: 'eChallan',
+//         subtitle: 'Clear traffic challans in seconds',
+//         badge: 'NEW',
+//         color: AppColors.catEChallan,
+//         icon: Icons.receipt_long_rounded,
+//         asset: 'assets/echallan_photo.png',
+//       ),
+//     ];
 
-    return Column(
-      children: [
-        CarouselSlider(
-          // Pad each card vertically so the colored shadow has room to render
-          // inside the viewport (was being clipped at 130px).
-          items: banners
-              .map((b) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: _BannerCard(banner: b),
-                  ))
-              .toList(),
-          options: CarouselOptions(
-            height: 156,
-            viewportFraction: 0.88,
-            enlargeCenterPage: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 4),
-            onPageChanged: (i, _) => onChange(i),
-          ),
-        ),
-        const SizedBox(height: 14),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: banners.asMap().entries.map((e) {
-            final active = e.key == current;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              height: 6,
-              width: active ? 20 : 6,
-              decoration: BoxDecoration(
-                color: active
-                    ? AppColors.primary
-                    : AppColors.primary.withOpacity(0.25),
-                borderRadius: BorderRadius.circular(3),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
+//     return Column(
+//       children: [
+//         CarouselSlider(
+//           // Pad each card vertically so the colored shadow has room to render
+//           // inside the viewport (was being clipped at 130px).
+//           items: banners
+//               .map((b) => Padding(
+//                     padding: const EdgeInsets.symmetric(vertical: 10),
+//                     child: _BannerCard(banner: b),
+//                   ))
+//               .toList(),
+//           options: CarouselOptions(
+//             height: 156,
+//             viewportFraction: 0.88,
+//             enlargeCenterPage: false,
+//             autoPlay: true,
+//             autoPlayInterval: const Duration(seconds: 4),
+//             onPageChanged: (i, _) => onChange(i),
+//           ),
+//         ),
+//         const SizedBox(height: 14),
+//         Row(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: banners.asMap().entries.map((e) {
+//             final active = e.key == current;
+//             return AnimatedContainer(
+//               duration: const Duration(milliseconds: 220),
+//               margin: const EdgeInsets.symmetric(horizontal: 3),
+//               height: 6,
+//               width: active ? 20 : 6,
+//               decoration: BoxDecoration(
+//                 color: active
+//                     ? AppColors.primary
+//                     : AppColors.primary.withOpacity(0.25),
+//                 borderRadius: BorderRadius.circular(3),
+//               ),
+//             );
+//           }).toList(),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
-class _Banner {
-  final String title;
-  final String subtitle;
-  final String badge;
-  final Color color;
-  final IconData icon;
-  final String asset;
-  _Banner({
-    required this.title,
-    required this.subtitle,
-    required this.badge,
-    required this.color,
-    required this.icon,
-    required this.asset,
-  });
-}
+// class _Banner {
+//   final String title;
+//   final String subtitle;
+//   final String badge;
+//   final Color color;
+//   final IconData icon;
+//   final String asset;
+//   _Banner({
+//     required this.title,
+//     required this.subtitle,
+//     required this.badge,
+//     required this.color,
+//     required this.icon,
+//     required this.asset,
+//   });
+// }
 
-class _BannerCard extends StatelessWidget {
-  const _BannerCard({required this.banner});
-  final _Banner banner;
+// class _BannerCard extends StatelessWidget {
+//   const _BannerCard({required this.banner});
+//   final _Banner banner;
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppRadii.lg),
-          border: Border.all(color: banner.color.withOpacity(0.18)),
-          boxShadow: AppShadows.tile(banner.color),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadii.lg),
-          child: Stack(
-            children: [
-              // Right-side asset image with a gradient fade into the card.
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: 170,
-                child: ShaderMask(
-                  blendMode: BlendMode.dstIn,
-                  shaderCallback: (bounds) => const LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [Colors.transparent, Colors.black, Colors.black],
-                    stops: [0.0, 0.35, 1.0],
-                  ).createShader(bounds),
-                  child: Image.asset(
-                    banner.asset,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.centerRight,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: banner.color.withOpacity(0.10),
-                      alignment: Alignment.center,
-                      child: Icon(banner.icon, color: banner.color, size: 48),
-                    ),
-                  ),
-                ),
-              ),
-              // Soft color wash overlay so text on the left stays legible.
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Colors.white,
-                        Colors.white.withOpacity(0.92),
-                        Colors.white.withOpacity(0.0),
-                      ],
-                      stops: const [0.0, 0.45, 0.75],
-                    ),
-                  ),
-                ),
-              ),
-              // Content on the left.
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: banner.color,
-                              borderRadius:
-                                  BorderRadius.circular(AppRadii.pill),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: banner.color.withOpacity(0.35),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              banner.badge,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            banner.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: AppColors.primaryDark,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.2,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            banner.subtitle,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: AppColors.primaryDark.withOpacity(0.62),
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 130),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(horizontal: 4),
+//       child: Container(
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(AppRadii.lg),
+//           border: Border.all(color: banner.color.withOpacity(0.18)),
+//           boxShadow: AppShadows.tile(banner.color),
+//         ),
+//         child: ClipRRect(
+//           borderRadius: BorderRadius.circular(AppRadii.lg),
+//           child: Stack(
+//             children: [
+//               // Right-side asset image with a gradient fade into the card.
+//               Positioned(
+//                 right: 0,
+//                 top: 0,
+//                 bottom: 0,
+//                 width: 170,
+//                 child: ShaderMask(
+//                   blendMode: BlendMode.dstIn,
+//                   shaderCallback: (bounds) => const LinearGradient(
+//                     begin: Alignment.centerLeft,
+//                     end: Alignment.centerRight,
+//                     colors: [Colors.transparent, Colors.black, Colors.black],
+//                     stops: [0.0, 0.35, 1.0],
+//                   ).createShader(bounds),
+//                   child: Image.asset(
+//                     banner.asset,
+//                     fit: BoxFit.cover,
+//                     alignment: Alignment.centerRight,
+//                     errorBuilder: (_, __, ___) => Container(
+//                       color: banner.color.withOpacity(0.10),
+//                       alignment: Alignment.center,
+//                       child: Icon(banner.icon, color: banner.color, size: 48),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               // Soft color wash overlay so text on the left stays legible.
+//               Positioned(
+//                 left: 0,
+//                 top: 0,
+//                 bottom: 0,
+//                 right: 0,
+//                 child: Container(
+//                   decoration: BoxDecoration(
+//                     gradient: LinearGradient(
+//                       begin: Alignment.centerLeft,
+//                       end: Alignment.centerRight,
+//                       colors: [
+//                         Colors.white,
+//                         Colors.white.withOpacity(0.92),
+//                         Colors.white.withOpacity(0.0),
+//                       ],
+//                       stops: const [0.0, 0.45, 0.75],
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               // Content on the left.
+//               Padding(
+//                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+//                 child: Row(
+//                   children: [
+//                     Expanded(
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           Container(
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 8, vertical: 3),
+//                             decoration: BoxDecoration(
+//                               color: banner.color,
+//                               borderRadius:
+//                                   BorderRadius.circular(AppRadii.pill),
+//                               boxShadow: [
+//                                 BoxShadow(
+//                                   color: banner.color.withOpacity(0.35),
+//                                   blurRadius: 8,
+//                                   offset: const Offset(0, 3),
+//                                 ),
+//                               ],
+//                             ),
+//                             child: Text(
+//                               banner.badge,
+//                               style: const TextStyle(
+//                                 color: Colors.white,
+//                                 fontSize: 9.5,
+//                                 fontWeight: FontWeight.w900,
+//                                 letterSpacing: 0.5,
+//                               ),
+//                             ),
+//                           ),
+//                           const SizedBox(height: 8),
+//                           Text(
+//                             banner.title,
+//                             maxLines: 1,
+//                             overflow: TextOverflow.ellipsis,
+//                             style: const TextStyle(
+//                               color: AppColors.primaryDark,
+//                               fontSize: 16,
+//                               fontWeight: FontWeight.w900,
+//                               letterSpacing: -0.2,
+//                             ),
+//                           ),
+//                           const SizedBox(height: 3),
+//                           Text(
+//                             banner.subtitle,
+//                             maxLines: 2,
+//                             overflow: TextOverflow.ellipsis,
+//                             style: TextStyle(
+//                               color: AppColors.primaryDark.withOpacity(0.62),
+//                               fontSize: 11.5,
+//                               fontWeight: FontWeight.w500,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                     const SizedBox(width: 130),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Services — 3-col colored tiles
