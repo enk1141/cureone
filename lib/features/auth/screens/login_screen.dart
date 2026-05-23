@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:my_cure_ui/features/auth/bloc/login/login_bloc.dart';
 import 'package:my_cure_ui/config/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -65,16 +66,24 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginOtpSent) {
+              final phone = _phoneController.text.trim();
+              SharedPreferences.getInstance().then((prefs) {
+                prefs.setString('mobile_number', phone);
+              });
               Navigator.pushNamed(
                 context,
                 AppRoutes.otp,
-                arguments: _phoneController.text.trim(),
+                arguments: phone,
               );
             } else if (state is LoginExistingUserSuccess) {
+              final phone = _phoneController.text.trim();
+              SharedPreferences.getInstance().then((prefs) {
+                prefs.setString('mobile_number', phone);
+              });
               Navigator.pushNamed(
                 context,
                 AppRoutes.enterMpin,
-                arguments: _phoneController.text.trim(),
+                arguments: phone,
               );
             }
 

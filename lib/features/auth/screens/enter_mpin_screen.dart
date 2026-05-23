@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/features/auth/bloc/mpin/mpin_bloc.dart';
 import 'package:my_cure_ui/config/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EnterMpinLoginScreen extends StatefulWidget {
-  final String mobileNumber;
-  const EnterMpinLoginScreen({super.key, required this.mobileNumber});
+  final String? mobileNumber;
+  const EnterMpinLoginScreen({super.key, this.mobileNumber});
 
   @override
   State<EnterMpinLoginScreen> createState() => _EnterMpinLoginScreenState();
@@ -15,13 +16,27 @@ class EnterMpinLoginScreen extends StatefulWidget {
 class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
   final TextEditingController _mpinController = TextEditingController();
   final FocusNode _mpinFocusNode = FocusNode();
+  String _mobileNumber = "";
 
   @override
   void initState() {
     super.initState();
+    _mobileNumber = widget.mobileNumber ?? "";
+    if (_mobileNumber.isEmpty) {
+      _loadMobileNumber();
+    }
     _mpinFocusNode.addListener(() {
       setState(() {});
     });
+  }
+
+  Future<void> _loadMobileNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _mobileNumber = prefs.getString('mobile_number') ?? "";
+      });
+    }
   }
 
   @override
@@ -216,7 +231,7 @@ class _EnterMpinLoginScreenState extends State<EnterMpinLoginScreen> {
                                                   Navigator.pushNamed(
                                                     context,
                                                     AppRoutes.otp,
-                                                    arguments: widget.mobileNumber,
+                                                    arguments: _mobileNumber,
                                                   );
                                                 },
                                           style: TextButton.styleFrom(

@@ -3,6 +3,7 @@ import 'package:my_cure_ui/config/app_theme.dart';
 import 'package:my_cure_ui/config/routes.dart';
 import 'package:my_cure_ui/shared/widgets/app_animations.dart';
 import 'package:my_cure_ui/shared/widgets/app_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Lightweight Profile tab. Real-data fields are stubs — kept minimal so the
 /// bottom-nav shell has four working tabs without scope-creeping.
@@ -124,11 +125,17 @@ class ProfileScreen extends StatelessWidget {
             FadeSlideIn(
               delay: const Duration(milliseconds: 400),
               child: OutlinedButton.icon(
-                onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.login,
-                  (_) => false,
-                ),
+                 onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
+                  if (context.mounted) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      AppRoutes.login,
+                      (_) => false,
+                    );
+                  }
+                },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.danger,
                   side: const BorderSide(color: AppColors.danger),

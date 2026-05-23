@@ -13,6 +13,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   equatable: ^2.0.8
   carousel_slider: ^5.1.2
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -25,6 +26,7 @@ flutter:
 
   assets:
     - assets/logo.png
+    - assets/telangana.png
     - assets/property_tax_banner.png
     - assets/water_bill_banner.png
     - assets/electricity_banner.png

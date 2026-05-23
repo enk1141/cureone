@@ -66,7 +66,7 @@ class AppRoutes {
         );
 
       case enterMpin:
-        final mobileNumber = settings.arguments as String;
+        final mobileNumber = settings.arguments as String?;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => MpinBloc(),

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 part 'mpin_event.dart';
 part 'mpin_state.dart';
 
@@ -23,8 +24,10 @@ class MpinBloc extends Bloc<MpinEvent, MpinState> {
       emit(MpinLoading());
       await Future.delayed(const Duration(seconds: 2));
 
-      // 🟢 2. Capture and save the user's customized pin to our runtime cache memory
+      // 🟢 2. Capture and save the user's customized pin to our runtime cache memory and preferences
       _savedMpin = event.mpin;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('saved_mpin', event.mpin);
 
       emit(MpinSuccess());
     });
@@ -35,8 +38,11 @@ class MpinBloc extends Bloc<MpinEvent, MpinState> {
 
       await Future.delayed(const Duration(milliseconds: 600));
 
-      // 🟢 3. Compare the typed pin directly to our updated memory variable instead of "1234"
-      if (event.pin == _savedMpin) { 
+      final prefs = await SharedPreferences.getInstance();
+      final actualSavedMpin = prefs.getString('saved_mpin') ?? _savedMpin;
+
+      // 🟢 3. Compare the typed pin directly to our preferences/memory variable instead of "1234"
+      if (event.pin == actualSavedMpin) { 
         emit(LoginMpinSuccess());
       } else {
         emit(LoginMpinFailure("Incorrect MPIN. Please try again."));

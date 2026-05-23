@@ -204,10 +204,34 @@ class _HeroHeader extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _CircleIconButton(
-                    icon: Icons.notifications_none_rounded,
-                    hasBadge: true,
-                    onTap: () {},
+                  Container(
+                    height: 42,
+                    width: 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(color: Colors.white.withOpacity(0.35)),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: Image.asset(
+                      "assets/logo.png",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    height: 42,
+                    width: 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(color: Colors.white.withOpacity(0.35)),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: Image.asset(
+                      "assets/telangana.png",
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ],
               ),
