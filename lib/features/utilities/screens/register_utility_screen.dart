@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/config/app_theme.dart';
 import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:my_cure_ui/shared/widgets/app_animations.dart';
+import 'package:my_cure_ui/shared/widgets/app_card.dart';
 
 /// Register a new utility — 3 simple steps:
 ///   1. Pick type
@@ -104,25 +105,25 @@ class _RegisterUtilityScreenState extends State<RegisterUtilityScreen> {
                 key: ValueKey(_step),
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  padding:
-                      const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
                   child: _buildStep(),
                 ),
               ),
             ),
           ),
-          _BottomBar(
-            primaryLabel: _step == 2 ? 'Verify & Save' : 'Continue',
-            tint: _category?.color ?? AppColors.primary,
-            enabled: _canProceed,
-            onPrimary: () {
-              if (_step < 2) {
-                _next();
-              } else {
-                _finish();
-              }
-            },
-          ),
+          if (_step > 0)
+            _BottomBar(
+              primaryLabel: _step == 2 ? 'Verify & Save' : 'Continue',
+              tint: _category?.color ?? AppColors.primary,
+              enabled: _canProceed,
+              onPrimary: () {
+                if (_step < 2) {
+                  _next();
+                } else {
+                  _finish();
+                }
+              },
+            ),
         ],
       ),
     );
@@ -133,7 +134,12 @@ class _RegisterUtilityScreenState extends State<RegisterUtilityScreen> {
       case 0:
         return _StepPickType(
           selected: _category,
-          onSelect: (c) => setState(() => _category = c),
+          onSelect: (c) {
+            setState(() {
+              _category = c;
+            });
+            _next();
+          },
         );
       case 1:
         return _StepCan(
@@ -163,7 +169,7 @@ class _Hero extends StatelessWidget {
   final VoidCallback onBack;
 
   static const _titles = [
-    'Pick a utility',
+    'Add Utility',
     'Enter your details',
     'Verify with OTP',
   ];
@@ -293,6 +299,20 @@ class _StepDots extends StatelessWidget {
 // Step 1 — Pick category
 // ─────────────────────────────────────────────────────────────────────────────
 
+class _ServiceItem {
+  final UtilityCategory category;
+  final String title;
+  final IconData icon;
+  final Color color;
+
+  const _ServiceItem({
+    required this.category,
+    required this.title,
+    required this.icon,
+    required this.color,
+  });
+}
+
 class _StepPickType extends StatelessWidget {
   const _StepPickType({required this.selected, required this.onSelect});
   final UtilityCategory? selected;
@@ -300,84 +320,171 @@ class _StepPickType extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: UtilityCategory.all.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.35,
+    final services = [
+      const _ServiceItem(
+        category: UtilityCategory.electricity,
+        title: 'Electricity',
+        icon: Icons.bolt_rounded,
+        color: AppColors.catElectricity,
       ),
-      itemBuilder: (context, i) {
-        final cat = UtilityCategory.all[i];
-        final isSelected = cat.key == selected?.key;
-        return FadeSlideIn(
-          delay: Duration(milliseconds: 60 * i),
-          child: PressableScale(
-            onTap: () => onSelect(cat),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppRadii.lg),
-                border: Border.all(
-                  color: isSelected
-                      ? cat.color
-                      : cat.color.withOpacity(0.18),
-                  width: isSelected ? 2 : 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: cat.color.withOpacity(isSelected ? 0.32 : 0.16),
-                    blurRadius: isSelected ? 22 : 14,
-                    offset: const Offset(0, 8),
+      const _ServiceItem(
+        category: UtilityCategory.water,
+        title: 'Water Bill',
+        icon: Icons.water_drop_rounded,
+        color: AppColors.catWater,
+      ),
+      const _ServiceItem(
+        category: UtilityCategory.propertyTax,
+        title: 'Property Tax',
+        icon: Icons.home_work_rounded,
+        color: AppColors.catPropertyTax,
+      ),
+      const _ServiceItem(
+        category: UtilityCategory.trade,
+        title: 'Trade License',
+        icon: Icons.badge_outlined,
+        color: AppColors.catTrade,
+      ),
+      const _ServiceItem(
+        category: UtilityCategory.echallan,
+        title: 'Traffic Challans',
+        icon: Icons.local_police_outlined,
+        color: AppColors.catEChallan,
+      ),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Select a Service',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textBody,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: services.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final item = services[index];
+            return PressableScale(
+              onTap: () => onSelect(item.category),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.border,
+                    width: 1.2,
                   ),
-                ],
-              ),
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: cat.color.withOpacity(0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(cat.icon, color: cat.color, size: 22),
-                      ),
-                      AnimatedScale(
-                        scale: isSelected ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(Icons.check_circle_rounded,
-                            color: cat.color, size: 22),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    cat.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w800,
-                      color:
-                          isSelected ? cat.color : AppColors.primaryDark,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.015),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: item.color.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        item.icon,
+                        color: item.color,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textBody,
+                        ),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textMuted,
+                      size: 22,
+                    ),
+                  ],
+                ),
               ),
+            );
+          },
+        ),
+        const SizedBox(height: 32),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF5FF),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFD6E4FF),
+              width: 1,
             ),
           ),
-        );
-      },
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD0E0FC),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.groups_rounded,
+                  color: AppColors.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'One time add.',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Easy payments forever!',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -802,3 +909,14 @@ class _BottomBar extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+

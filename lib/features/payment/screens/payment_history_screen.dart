@@ -13,60 +13,22 @@ class PaymentHistoryScreen extends StatefulWidget {
 }
 
 class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
-  String _filterKey = 'all';
-  DateTimeRange? _dateRange;
+  String _filterKey = 'All';
 
   List<PaymentRecord> get _filtered {
     var records = PaymentHistoryRegistry.instance.all;
-    if (_filterKey != 'all') {
+    if (_filterKey != 'All') {
       records = records
-          .where((r) => r.bills.any((b) => b['category'] == _filterKey))
+          .where((r) => r.status.toLowerCase() == _filterKey.toLowerCase())
           .toList();
     }
-    if (_dateRange != null) {
-      records = records.where((r) {
-        return !r.date.isBefore(_dateRange!.start) &&
-            !r.date.isAfter(_dateRange!.end.add(const Duration(days: 1)));
-      }).toList();
-    }
     return records;
-  }
-
-  Future<void> _pickRange() async {
-    final now = DateTime.now();
-    final result = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(now.year - 2),
-      lastDate: now,
-      initialDateRange: _dateRange,
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: AppColors.primary,
-            onPrimary: Colors.white,
-            surface: Colors.white,
-            onSurface: AppColors.primaryDark,
-          ),
-        ),
-        child: child!,
-      ),
-    );
-    if (result != null) setState(() => _dateRange = result);
   }
 
   @override
   Widget build(BuildContext context) {
     final records = _filtered;
     final totalPaid = records.fold<double>(0.0, (s, r) => s + r.amount);
-    final thisMonth = records
-        .where((r) =>
-            r.date.month == DateTime.now().month &&
-            r.date.year == DateTime.now().year)
-        .toList();
-    final monthTotal =
-        thisMonth.fold<double>(0.0, (s, r) => s + r.amount);
-
-    final grouped = _groupByBucket(records);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -88,26 +50,12 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                 const SizedBox(height: 18),
                 FadeSlideIn(
                   delay: const Duration(milliseconds: 120),
-                  child: _StatsRow(
-                    monthTotal: monthTotal,
-                    monthCount: thisMonth.length,
-                    lifetimeTotal: PaymentHistoryRegistry.instance.all
-                        .fold<double>(0.0, (s, r) => s + r.amount),
+                  child: _StatusFilterChips(
+                    selectedFilter: _filterKey,
+                    onSelect: (val) => setState(() => _filterKey = val),
                   ),
                 ),
-                const SizedBox(height: 18),
-                FadeSlideIn(
-                  delay: const Duration(milliseconds: 200),
-                  child: _FilterBar(
-                    filterKey: _filterKey,
-                    dateRange: _dateRange,
-                    onUtilityChange: (k) =>
-                        setState(() => _filterKey = k),
-                    onDateTap: _pickRange,
-                    onClearDates: () => setState(() => _dateRange = null),
-                  ),
-                ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -117,106 +65,24 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
               child: _EmptyHistory(),
             )
           else
-            ..._buildGroupedSlivers(grouped),
+            SliverList.builder(
+              itemCount: records.length,
+              itemBuilder: (context, index) {
+                return FadeSlideIn(
+                  delay: Duration(milliseconds: 160 + index * 50),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                    child: _PaymentHistoryTile(record: records[index]),
+                  ),
+                );
+              },
+            ),
           const SliverToBoxAdapter(
             child: SizedBox(height: 110),
           ),
         ],
       ),
     );
-  }
-
-  /// Buckets records into Today / Yesterday / This week / Earlier.
-  Map<String, List<PaymentRecord>> _groupByBucket(
-      List<PaymentRecord> records) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final weekAgo = today.subtract(const Duration(days: 7));
-
-    final map = <String, List<PaymentRecord>>{
-      'Today': [],
-      'Yesterday': [],
-      'This week': [],
-      'Earlier': [],
-    };
-    for (final r in records) {
-      final d = DateTime(r.date.year, r.date.month, r.date.day);
-      if (d == today) {
-        map['Today']!.add(r);
-      } else if (d == yesterday) {
-        map['Yesterday']!.add(r);
-      } else if (d.isAfter(weekAgo)) {
-        map['This week']!.add(r);
-      } else {
-        map['Earlier']!.add(r);
-      }
-    }
-    // Drop empty buckets.
-    map.removeWhere((_, v) => v.isEmpty);
-    return map;
-  }
-
-  List<Widget> _buildGroupedSlivers(
-      Map<String, List<PaymentRecord>> grouped) {
-    final slivers = <Widget>[];
-    var staggerIdx = 0;
-    grouped.forEach((bucket, items) {
-      slivers.add(SliverToBoxAdapter(
-        child: FadeSlideIn(
-          delay: Duration(milliseconds: 280 + staggerIdx * 60),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-            child: Row(
-              children: [
-                Text(
-                  bucket,
-                  style: const TextStyle(
-                    color: AppColors.primaryDark,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(AppRadii.pill),
-                  ),
-                  child: Text(
-                    '${items.length}',
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ));
-      staggerIdx++;
-      slivers.add(SliverList.builder(
-        itemCount: items.length,
-        itemBuilder: (context, i) {
-          return FadeSlideIn(
-            delay:
-                Duration(milliseconds: 320 + staggerIdx * 60 + i * 50),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-              child: _HistoryTile(record: items[i]),
-            ),
-          );
-        },
-      ));
-      staggerIdx++;
-    });
-    return slivers;
   }
 }
 
@@ -332,413 +198,150 @@ class _HeroHeader extends StatelessWidget {
 // Stats overlay row
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _StatsRow extends StatelessWidget {
-  const _StatsRow({
-    required this.monthTotal,
-    required this.monthCount,
-    required this.lifetimeTotal,
-  });
-
-  final double monthTotal;
-  final int monthCount;
-  final double lifetimeTotal;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: _StatCard(
-              tint: AppColors.success,
-              icon: Icons.calendar_month_rounded,
-              label: 'This month',
-              value: '₹${_short(monthTotal)}',
-              sub: '$monthCount paid',
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _StatCard(
-              tint: AppColors.primary,
-              icon: Icons.account_balance_wallet_rounded,
-              label: 'Lifetime',
-              value: '₹${_short(lifetimeTotal)}',
-              sub: 'All time',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _short(double v) {
-    if (v >= 10000000) return '${(v / 10000000).toStringAsFixed(1)}Cr';
-    if (v >= 100000) return '${(v / 100000).toStringAsFixed(1)}L';
-    if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}K';
-    return v.toStringAsFixed(0);
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  const _StatCard({
-    required this.tint,
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.sub,
-  });
-
-  final Color tint;
-  final IconData icon;
-  final String label;
-  final String value;
-  final String sub;
-
-  @override
-  Widget build(BuildContext context) {
-    return TintedCard(
-      tint: tint,
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 34,
-            width: 34,
-            decoration: BoxDecoration(
-              color: tint.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 17, color: tint),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textMuted,
-            ),
-          ),
-          const SizedBox(height: 2),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                color: tint,
-              ),
-            ),
-          ),
-          const SizedBox(height: 1),
-          Text(
-            sub,
-            style: const TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textMuted,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
-// Filter bar
+// Status filter chips
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _FilterBar extends StatelessWidget {
-  const _FilterBar({
-    required this.filterKey,
-    required this.dateRange,
-    required this.onUtilityChange,
-    required this.onDateTap,
-    required this.onClearDates,
+class _StatusFilterChips extends StatelessWidget {
+  const _StatusFilterChips({
+    required this.selectedFilter,
+    required this.onSelect,
   });
 
-  final String filterKey;
-  final DateTimeRange? dateRange;
-  final ValueChanged<String> onUtilityChange;
-  final VoidCallback onDateTap;
-  final VoidCallback onClearDates;
+  final String selectedFilter;
+  final ValueChanged<String> onSelect;
 
   @override
   Widget build(BuildContext context) {
-    final chips = <_FilterChipItem>[
-      const _FilterChipItem('All', 'all', null),
-      ...UtilityCategory.all.map((c) => _FilterChipItem(c.label, c.key, c)),
-    ];
+    final filters = const ['All', 'Success', 'Failed', 'Refund'];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 38,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: chips.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (context, i) {
-              final c = chips[i];
-              final selected = c.key == filterKey;
-              final color = c.category?.color ?? AppColors.primary;
-              return InkWell(
-                borderRadius: BorderRadius.circular(AppRadii.pill),
-                onTap: () => onUtilityChange(c.key),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: selected ? color : Colors.white,
-                    borderRadius: BorderRadius.circular(AppRadii.pill),
-                    border: Border.all(
-                      color: selected ? color : AppColors.border,
-                    ),
-                    boxShadow: selected
-                        ? [
-                            BoxShadow(
-                              color: color.withOpacity(0.30),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (c.category != null) ...[
-                        Icon(
-                          c.category!.icon,
-                          size: 13,
-                          color: selected ? Colors.white : color,
-                        ),
-                        const SizedBox(width: 5),
-                      ],
-                      Text(
-                        c.label,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: selected ? Colors.white : color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(AppRadii.md),
-            onTap: onDateTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 12),
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: filters.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final filter = filters[index];
+          final isSelected = filter.toLowerCase() == selectedFilter.toLowerCase();
+          
+          return InkWell(
+            borderRadius: BorderRadius.circular(100),
+            onTap: () => onSelect(filter),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 18),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppRadii.md),
-                border: Border.all(color: AppColors.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: isSelected ? AppColors.primary : const Color(0xFFEFF3FA),
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : const Color(0xFFE2E8F0),
+                  width: 1,
+                ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    height: 26,
-                    width: 26,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.10),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.date_range_rounded,
-                        color: AppColors.primary, size: 14),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      dateRange == null
-                          ? 'All dates'
-                          : '${_short(dateRange!.start)} – ${_short(dateRange!.end)}',
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                  ),
-                  if (dateRange != null)
-                    InkWell(
-                      onTap: onClearDates,
-                      child: const Icon(Icons.close_rounded,
-                          size: 16, color: AppColors.textMuted),
-                    ),
-                ],
+              alignment: Alignment.center,
+              child: Text(
+                filter,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: isSelected ? Colors.white : AppColors.textMuted,
+                ),
               ),
             ),
-          ),
-        ),
-      ],
+          );
+        },
+      ),
     );
   }
-
-  String _short(DateTime d) {
-    return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
-  }
-}
-
-class _FilterChipItem {
-  final String label;
-  final String key;
-  final UtilityCategory? category;
-  const _FilterChipItem(this.label, this.key, this.category);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// History tile (colored shadow card)
+// Payment History Tile
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _HistoryTile extends StatelessWidget {
-  const _HistoryTile({required this.record});
+class _PaymentHistoryTile extends StatelessWidget {
+  const _PaymentHistoryTile({required this.record});
   final PaymentRecord record;
 
   @override
   Widget build(BuildContext context) {
-    final primaryCat =
-        UtilityCategory.fromKey(record.bills.first['category'] as String);
-    final isMulti = record.bills.length > 1;
-    final ok = record.status == 'Success';
+    final statusColor = record.status.toLowerCase() == 'success'
+        ? const Color(0xFF2E7D32)
+        : record.status.toLowerCase() == 'failed'
+            ? AppColors.danger
+            : const Color(0xFFE65100); // orange/amber for refund
 
     return PressableScale(
       onTap: () => _showReceiptSheet(context),
-      child: TintedCard(
-        tint: primaryCat.color,
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            Container(
-              height: 46,
-              width: 46,
-              decoration: BoxDecoration(
-                color: primaryCat.color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child:
-                  Icon(primaryCat.icon, color: primaryCat.color, size: 22),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.border,
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.015),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
-            const SizedBox(width: 12),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Left column: Date & Service
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          isMulti
-                              ? '${record.bills.length} bills paid'
-                              : record.bills.first['name'] as String,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      StatusChip(
-                        label: ok ? 'PAID' : 'FAILED',
-                        color: ok ? AppColors.success : AppColors.danger,
-                      ),
-                    ],
+                  Text(
+                    _formatDate(record.date),
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryDark,
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.access_time_rounded,
-                          size: 11,
-                          color: AppColors.textMuted.withOpacity(0.9)),
-                      const SizedBox(width: 3),
-                      Text(
-                        _time(record.date),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Container(
-                        width: 3,
-                        height: 3,
-                        decoration: const BoxDecoration(
-                          color: AppColors.textMuted,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Icon(_methodIcon(record.method),
-                          size: 11, color: AppColors.textMuted),
-                      const SizedBox(width: 3),
-                      Flexible(
-                        child: Text(
-                          record.method,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '#${record.transactionId.substring(record.transactionId.length - 8)}',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textMuted.withOpacity(0.8),
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                      Text(
-                        '₹${record.amount.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: primaryCat.color,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    _getServiceName(record),
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textMuted,
+                    ),
                   ),
                 ],
               ),
+            ),
+            // Right column: Amount & Status
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  _formatAmount(record.amount),
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryDark,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  record.status,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: statusColor,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -746,20 +349,56 @@ class _HistoryTile extends StatelessWidget {
     );
   }
 
-  IconData _methodIcon(String method) {
-    final m = method.toLowerCase();
-    if (m.contains('upi')) return Icons.account_balance_wallet_rounded;
-    if (m.contains('net')) return Icons.account_balance_rounded;
-    if (m.contains('card')) return Icons.credit_card_rounded;
-    if (m.contains('wallet')) return Icons.wallet_rounded;
-    return Icons.payments_rounded;
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    final day = date.day.toString().padLeft(2, '0');
+    final month = months[date.month - 1];
+    final year = date.year;
+    return '$day $month $year';
   }
 
-  String _time(DateTime d) {
-    final h = d.hour > 12 ? d.hour - 12 : (d.hour == 0 ? 12 : d.hour);
-    final m = d.minute.toString().padLeft(2, '0');
-    final ap = d.hour >= 12 ? 'PM' : 'AM';
-    return '$h:$m $ap';
+  String _getServiceName(PaymentRecord record) {
+    if (record.bills.length > 1) {
+      return 'Multiple Services';
+    }
+    if (record.bills.isEmpty) {
+      return 'Unknown Service';
+    }
+    final catKey = record.bills.first['category'] as String?;
+    if (catKey == 'electricity') return 'Electricity';
+    if (catKey == 'hmwssb' || catKey == 'water') return 'Water Bill';
+    if (catKey == 'property_tax') return 'Property Tax';
+    if (catKey == 'trade') return 'Trade License';
+    if (catKey == 'echallan') return 'Traffic Challan';
+    return record.bills.first['name'] as String? ?? 'Utility Bill';
+  }
+
+  String _formatAmount(double v) {
+    final s = v.toStringAsFixed(2);
+    final parts = s.split('.');
+    final whole = parts[0];
+    final buf = StringBuffer();
+    if (whole.length <= 3) {
+      buf.write(whole);
+    } else {
+      final last3 = whole.substring(whole.length - 3);
+      var rest = whole.substring(0, whole.length - 3);
+      final chunks = <String>[];
+      while (rest.length > 2) {
+        chunks.insert(0, rest.substring(rest.length - 2));
+        rest = rest.substring(0, rest.length - 2);
+      }
+      if (rest.isNotEmpty) chunks.insert(0, rest);
+      buf.write(chunks.join(','));
+      buf.write(',');
+      buf.write(last3);
+    }
+    buf.write('.');
+    buf.write(parts[1]);
+    return '₹ ${buf.toString()}';
   }
 
   void _showReceiptSheet(BuildContext context) {
@@ -932,6 +571,7 @@ class _HistoryTile extends StatelessWidget {
     return '${d.day} ${m[d.month - 1]} ${d.year}, $h:$mm $ap';
   }
 }
+
 
 class _EmptyHistory extends StatelessWidget {
   const _EmptyHistory();
