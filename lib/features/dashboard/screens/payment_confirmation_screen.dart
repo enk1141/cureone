@@ -149,9 +149,10 @@ class PaymentConfirmationScreen extends StatelessWidget {
 
                       // Navigate back to Dashboard
                       Navigator.pop(dialogContext); // pop dialog
-                      Navigator.popUntil(
+                      Navigator.pushNamedAndRemoveUntil(
                         context,
-                        ModalRoute.withName(AppRoutes.dashboard),
+                        AppRoutes.dashboard,
+                        (route) => false,
                       );
                     },
                     child: const Text(
