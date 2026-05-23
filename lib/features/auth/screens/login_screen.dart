@@ -460,7 +460,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: () {
                                 Navigator.pushNamed(
                                   context,
-                                  AppRoutes.registerUtility,
+                                  AppRoutes.quickPay,
                                   arguments: DashboardBloc(),
                                 );
                               },

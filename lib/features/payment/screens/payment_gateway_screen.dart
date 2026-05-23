@@ -22,10 +22,9 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
   bool _processing = false;
 
   static const _methods = [
-    _PayMethod('UPI', Icons.account_balance_wallet_rounded, AppColors.success),
+    _PayMethod('UPI', null, AppColors.success, assetPath: 'assets/upi.jpg'),
     _PayMethod('Net Banking', Icons.account_balance_rounded, AppColors.info),
-    _PayMethod('Debit/Credit Card', Icons.credit_card_rounded,
-        AppColors.catTrade),
+    _PayMethod('Debit/Credit Card', Icons.credit_card_rounded, AppColors.catTrade),
     _PayMethod('Wallets', Icons.wallet_rounded, AppColors.warning),
   ];
 
@@ -74,10 +73,12 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         child: Column(
           children: [
             Expanded(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                children: [
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                   _TxnDetailsCard(
                     transactionId:
                         'TXN${DateTime.now().millisecondsSinceEpoch.toString().substring(4, 12)}',
@@ -87,79 +88,101 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                   const SizedBox(height: 16),
                   const Text('Select Payment Method', style: AppText.h3),
                   const SizedBox(height: 10),
-                  GridView.builder(
+                  ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: _methods.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 1.45,
-                    ),
+                    separatorBuilder: (context, i) => const SizedBox(height: 12),
                     itemBuilder: (context, i) {
                       final m = _methods[i];
                       final selected = _methodIndex == i;
                       return AppCard(
                         borderColor:
                             selected ? m.color : AppColors.border,
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         onTap: () => setState(() => _methodIndex = i),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Row(
                           children: [
                             Container(
-                              height: 38,
-                              width: 38,
+                              height: 42,
+                              width: 42,
                               decoration: BoxDecoration(
                                 color: m.color.withOpacity(0.14),
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(m.icon, color: m.color, size: 20),
+                              child: m.assetPath != null
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.asset(m.assetPath!, fit: BoxFit.contain),
+                                    )
+                                  : Icon(m.icon, color: m.color, size: 22),
                             ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    m.label,
-                                    style: TextStyle(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: selected
-                                          ? m.color
-                                          : AppColors.primaryDark,
-                                    ),
-                                  ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                m.label,
+                                style: TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: selected
+                                      ? m.color
+                                      : AppColors.primaryDark,
                                 ),
-                                if (selected)
-                                  Icon(Icons.check_circle_rounded,
-                                      color: m.color, size: 18),
-                              ],
+                              ),
                             ),
+                            if (selected)
+                              Icon(Icons.check_circle_rounded,
+                                  color: m.color, size: 22)
+                            else
+                              const Icon(Icons.radio_button_unchecked_rounded,
+                                  color: AppColors.border, size: 22),
                           ],
                         ),
                       );
                     },
                   ),
                   const SizedBox(height: 18),
-                  const AppCard(
+                  AppCard(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.lock_outline_rounded,
-                            color: AppColors.success, size: 18),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Your transaction is encrypted end-to-end.',
-                            style: AppText.bodyMuted,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withOpacity(0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.gpp_good_rounded,
+                              color: AppColors.success, size: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          '100% Secure Payments',
+                          style: TextStyle(
+                            color: AppColors.primaryDark,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'You will be redirected to secure\npayment gateway',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.primaryDark.withOpacity(0.7),
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                  ),
+                    ],
+                  ),
+                ),
               ),
             ),
             _PayBar(
@@ -176,9 +199,10 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
 
 class _PayMethod {
   final String label;
-  final IconData icon;
+  final IconData? icon;
   final Color color;
-  const _PayMethod(this.label, this.icon, this.color);
+  final String? assetPath;
+  const _PayMethod(this.label, this.icon, this.color, {this.assetPath});
 }
 
 class _TxnDetailsCard extends StatelessWidget {
