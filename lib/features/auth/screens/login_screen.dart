@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:my_cure_ui/features/auth/bloc/login/login_bloc.dart';
 import 'package:my_cure_ui/config/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -97,35 +98,42 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           },
           builder: (context, state) {
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(), //
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24), //
-                child: Column(
-                  children: [
-                    const SizedBox(height: 50), //
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          children: [
+                    const SizedBox(height: 20), //
 
                     // Logo Container
                     Container(
-                      height: 90, //
-                      width: 90, //
+                      height: 70, //
+                      width: 70, //
                       decoration: BoxDecoration(
                         color: Colors.white, //
-                        borderRadius: BorderRadius.circular(24), //
+                        borderRadius: BorderRadius.circular(18), //
                         border: Border.all(
                           color: const Color(0xFFE5E9F2), //
                           width: 1, //
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(16), //
+                        padding: const EdgeInsets.all(12), //
                         child: Image.asset(
                           "assets/logo.png", //
                           fit: BoxFit.contain, //
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20), //
+                    const SizedBox(height: 16), //
 
                     // App Name
                     const Text(
@@ -415,10 +423,68 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
+                          const SizedBox(height: 20), //
+
+                          // --- OR ---
+                          Row(
+                            children: [
+                              Expanded(child: Divider(color: Colors.grey.shade300, thickness: 1)),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  "OR",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade500,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              Expanded(child: Divider(color: Colors.grey.shade300, thickness: 1)),
+                            ],
+                          ),
+                          const SizedBox(height: 20), //
+
+                          // Quick Pay Button
+                          SizedBox(
+                            width: double.infinity, //
+                            height: 52, //
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF0653C7), width: 1.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16), //
+                                ),
+                                backgroundColor: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.registerUtility,
+                                  arguments: DashboardBloc(),
+                                );
+                              },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.flash_on, color: Color(0xFF0653C7), size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "Quick Pay",
+                                    style: TextStyle(
+                                      color: Color(0xFF0653C7),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 30), //
+                    const Spacer(),
 
                     // Secure Footer Tag
                     Container(
@@ -467,9 +533,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 24), //
-                  ],
-                ),
-              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             );
           },
         ),

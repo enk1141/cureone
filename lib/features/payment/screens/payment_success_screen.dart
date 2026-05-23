@@ -245,9 +245,10 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
             ),
             _DoneBar(
               onDone: () {
-                Navigator.popUntil(
+                Navigator.pushNamedAndRemoveUntil(
                   context,
-                  ModalRoute.withName(AppRoutes.home),
+                  AppRoutes.home,
+                  (route) => false,
                 );
               },
             ),

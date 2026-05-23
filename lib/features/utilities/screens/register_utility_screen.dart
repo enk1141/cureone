@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_cure_ui/config/app_theme.dart';
+import 'package:my_cure_ui/config/routes.dart';
 import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:my_cure_ui/shared/widgets/app_animations.dart';
 import 'package:my_cure_ui/shared/widgets/app_card.dart';
@@ -70,7 +71,11 @@ class _RegisterUtilityScreenState extends State<RegisterUtilityScreen> {
         behavior: SnackBarBehavior.floating,
       ),
     );
-    Navigator.pop(context);
+    Navigator.pushReplacementNamed(
+      context,
+      AppRoutes.myUtilities,
+      arguments: bloc,
+    );
   }
 
   @override
