@@ -17,6 +17,7 @@ import 'package:my_cure_ui/features/utilities/screens/register_utility_screen.da
 import 'package:my_cure_ui/features/payment/screens/payment_gateway_screen.dart';
 import 'package:my_cure_ui/features/payment/screens/payment_success_screen.dart';
 import 'package:my_cure_ui/features/payment/screens/payment_history_screen.dart';
+import 'package:my_cure_ui/features/profile/screens/help_support_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -34,6 +35,7 @@ class AppRoutes {
   static const String paymentGateway = '/payment-gateway';
   static const String paymentSuccess = '/payment-success';
   static const String paymentHistory = '/payment-history';
+  static const String helpSupport = '/help-support';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -163,6 +165,12 @@ class AppRoutes {
       case paymentHistory:
         return MaterialPageRoute(
           builder: (_) => const PaymentHistoryScreen(),
+          settings: settings,
+        );
+
+      case helpSupport:
+        return MaterialPageRoute(
+          builder: (_) => const HelpSupportScreen(),
           settings: settings,
         );
 

@@ -40,15 +40,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final pending = state.utilityBills
               .where((b) => !((b['isPaid'] as bool?) ?? false))
               .toList();
-          final paid = state.utilityBills
-              .where((b) => (b['isPaid'] as bool?) ?? false)
-              .toList();
           final totalDue = pending.fold<double>(
               0.0, (s, b) => s + (b['amount'] as num).toDouble());
-          final electricityCount = state.utilityBills
-              .where((b) =>
-                  !((b['isPaid'] as bool?) ?? false) &&
-                  b['category'] == 'electricity')
+
+          final utilitiesCount = state.utilityBills.length;
+          final dueCount = state.utilityBills
+              .where((b) => (b['isPaid'] != true && (b['amount'] as num) > 0))
+              .length;
+          final paidCount = state.utilityBills
+              .where((b) => (b['isPaid'] == true || (b['amount'] as num) == 0))
               .length;
 
           return SingleChildScrollView(
@@ -67,38 +67,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       FadeSlideIn(
                         delay: const Duration(milliseconds: 120),
                         child: _OverlaySummary(
-                          electricityDue: state.utilityBills
-                              .where((b) =>
-                                  !((b['isPaid'] as bool?) ?? false) &&
-                                  b['category'] == 'electricity')
-                              .fold<double>(
-                                  0.0,
-                                  (s, b) =>
-                                      s + (b['amount'] as num).toDouble()),
-                          tradeDue: state.utilityBills
-                              .where((b) =>
-                                  !((b['isPaid'] as bool?) ?? false) &&
-                                  b['category'] == 'trade')
-                              .fold<double>(
-                                  0.0,
-                                  (s, b) =>
-                                      s + (b['amount'] as num).toDouble()),
-                          taxDue: state.utilityBills
-                              .where((b) =>
-                                  !((b['isPaid'] as bool?) ?? false) &&
-                                  b['category'] == 'property_tax')
-                              .fold<double>(
-                                  0.0,
-                                  (s, b) =>
-                                      s + (b['amount'] as num).toDouble()),
-                          echallanDue: state.utilityBills
-                              .where((b) =>
-                                  !((b['isPaid'] as bool?) ?? false) &&
-                                  b['category'] == 'echallan')
-                              .fold<double>(
-                                  0.0,
-                                  (s, b) =>
-                                      s + (b['amount'] as num).toDouble()),
+                          utilitiesCount: utilitiesCount,
+                          dueCount: dueCount,
+                          paidCount: paidCount,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -272,7 +243,7 @@ class _HeroHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppRadii.pill),
                       ),
                       child: Text(
-                        'Pay Your Bills',
+                        'Pay All Bills',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -370,25 +341,22 @@ class _CircleIconButton extends StatelessWidget {
 
 class _OverlaySummary extends StatelessWidget {
   const _OverlaySummary({
-    required this.electricityDue,
-    required this.tradeDue,
-    required this.taxDue,
-    required this.echallanDue,
+    required this.utilitiesCount,
+    required this.dueCount,
+    required this.paidCount,
   });
 
-  final double electricityDue;
-  final double tradeDue;
-  final double taxDue;
-  final double echallanDue;
+  final int utilitiesCount;
+  final int dueCount;
+  final int paidCount;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
-          // Clean off-white shade — no aggressive gradient.
           color: const Color(0xFFFBFCFE),
           borderRadius: BorderRadius.circular(AppRadii.xl),
           border: Border.all(color: AppColors.border),
@@ -397,31 +365,21 @@ class _OverlaySummary extends StatelessWidget {
         child: Row(
           children: [
             _stat(
-              icon: Icons.bolt_rounded,
-              label: 'Electricity',
-              value: '3',
-              color: AppColors.catElectricity,
+              label: 'Utilities',
+              value: '$utilitiesCount',
+              color: AppColors.primary,
             ),
             _divider(),
             _stat(
-              icon: Icons.storefront_rounded,
-              label: 'Trade',
-              value: '2',
-              color: AppColors.catTrade,
+              label: 'Due Bills',
+              value: '$dueCount',
+              color: AppColors.danger,
             ),
             _divider(),
             _stat(
-              icon: Icons.account_balance_rounded,
-              label: 'Tax',
-              value: '1',
-              color: AppColors.catPropertyTax,
-            ),
-            _divider(),
-            _stat(
-              icon: Icons.receipt_long_rounded,
-              label: 'eChallan',
-              value: '1',
-              color: AppColors.catEChallan,
+              label: 'Paid',
+              value: '$paidCount',
+              color: AppColors.success,
             ),
           ],
         ),
@@ -429,22 +387,7 @@ class _OverlaySummary extends StatelessWidget {
     );
   }
 
-  /// Compact rupee display: 12500 → 12.5K, 1250000 → 12.5L.
-  String _compact(double v) {
-    if (v >= 10000000) {
-      return '${(v / 10000000).toStringAsFixed(1)}Cr';
-    }
-    if (v >= 100000) {
-      return '${(v / 100000).toStringAsFixed(1)}L';
-    }
-    if (v >= 1000) {
-      return '${(v / 1000).toStringAsFixed(1)}K';
-    }
-    return v.toStringAsFixed(0);
-  }
-
   Widget _stat({
-    required IconData icon,
     required String label,
     required String value,
     required Color color,
@@ -453,32 +396,19 @@ class _OverlaySummary extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            height: 30,
-            width: 30,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 15, color: color),
-          ),
-          const SizedBox(height: 6),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w900,
-                color: color,
-              ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: color,
             ),
           ),
-          const SizedBox(height: 1),
+          const SizedBox(height: 4),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: FontWeight.w600,
               color: AppColors.textMuted,
             ),

@@ -28,10 +28,13 @@ class _RegisterUtilityScreenState extends State<RegisterUtilityScreen> {
   final _canController = TextEditingController();
   final _otp = List.generate(4, (_) => TextEditingController());
   final _otpFocus = List.generate(4, (_) => FocusNode());
+  final _scrollController = ScrollController();
+  double _previousBottomInset = 0;
 
   @override
   void dispose() {
     _canController.dispose();
+    _scrollController.dispose();
     for (final c in _otp) {
       c.dispose();
     }
@@ -80,39 +83,60 @@ class _RegisterUtilityScreenState extends State<RegisterUtilityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentBottomInset = MediaQuery.of(context).viewInsets.bottom;
+    if (_previousBottomInset > 0 && currentBottomInset == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      });
+    }
+    _previousBottomInset = currentBottomInset;
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: Column(
         children: [
-          FadeSlideIn(
-            offset: const Offset(0, -18),
-            child: _Hero(step: _step, onBack: _back),
-          ),
           Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 280),
-              transitionBuilder: (child, animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0.12, 0),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    )),
-                    child: child,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  FadeSlideIn(
+                    offset: const Offset(0, -18),
+                    child: _Hero(step: _step, onBack: _back),
                   ),
-                );
-              },
-              child: KeyedSubtree(
-                key: ValueKey(_step),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-                  child: _buildStep(),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 280),
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0.12, 0),
+                              end: Offset.zero,
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            )),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: KeyedSubtree(
+                        key: ValueKey(_step),
+                        child: _buildStep(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -191,14 +215,14 @@ class _Hero extends StatelessWidget {
       decoration: const BoxDecoration(
         gradient: AppGradients.brand,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
         ),
       ),
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -212,7 +236,7 @@ class _Hero extends StatelessWidget {
                   _StepDots(current: step),
                 ],
               ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 12),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 240),
                 child: Text(
@@ -220,13 +244,13 @@ class _Hero extends StatelessWidget {
                   key: ValueKey('title-$step'),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.2,
                   ),
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 3),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 240),
                 child: Text(
@@ -234,7 +258,7 @@ class _Hero extends StatelessWidget {
                   key: ValueKey('sub-$step'),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.80),
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -258,14 +282,14 @@ class _CircleButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadii.pill),
       onTap: onTap,
       child: Container(
-        height: 40,
-        width: 40,
+        height: 34,
+        width: 34,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.16),
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white.withOpacity(0.32)),
         ),
-        child: Icon(icon, color: Colors.white, size: 18),
+        child: Icon(icon, color: Colors.white, size: 16),
       ),
     );
   }
@@ -369,10 +393,11 @@ class _StepPickType extends StatelessWidget {
             color: AppColors.textBody,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
         ListView.separated(
+          padding: EdgeInsets.zero,
           shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           itemCount: services.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {

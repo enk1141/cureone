@@ -8,8 +8,15 @@ import 'package:my_cure_ui/shared/widgets/app_card.dart';
 
 /// Bills tab — lists every utility the user has registered, grouped by type.
 /// Tap a card → utility details. "+" → register flow (also reachable via FAB).
-class MyUtilitiesScreen extends StatelessWidget {
+class MyUtilitiesScreen extends StatefulWidget {
   const MyUtilitiesScreen({super.key});
+
+  @override
+  State<MyUtilitiesScreen> createState() => _MyUtilitiesScreenState();
+}
+
+class _MyUtilitiesScreenState extends State<MyUtilitiesScreen> {
+  String _selectedFilter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +24,22 @@ class MyUtilitiesScreen extends StatelessWidget {
       backgroundColor: AppColors.surface,
       body: BlocBuilder<DashboardBloc, DashboardState>(
         builder: (context, state) {
-          final grouped = _groupByCategory(state.utilityBills);
+          final allCount = state.utilityBills.length;
+          final dueCount = state.utilityBills
+              .where((b) => (b['isPaid'] != true && (b['amount'] as num) > 0))
+              .length;
+          final paidCount = state.utilityBills
+              .where((b) => (b['isPaid'] == true || (b['amount'] as num) == 0))
+              .length;
+
+          final filteredBills = state.utilityBills.where((b) {
+            final isPaid = b['isPaid'] == true || (b['amount'] as num) == 0;
+            if (_selectedFilter == 'Due') return !isPaid;
+            if (_selectedFilter == 'Paid') return isPaid;
+            return true;
+          }).toList();
+
+          final grouped = _groupByCategory(filteredBills);
 
           return CustomScrollView(
             physics: const BouncingScrollPhysics(),
@@ -28,6 +50,21 @@ class MyUtilitiesScreen extends StatelessWidget {
                   child: _Header(count: state.utilityBills.length),
                 ),
               ),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              SliverToBoxAdapter(
+                child: _StatusFilterChips(
+                  selectedFilter: _selectedFilter,
+                  allCount: allCount,
+                  dueCount: dueCount,
+                  paidCount: paidCount,
+                  onSelect: (filter) {
+                    setState(() {
+                      _selectedFilter = filter;
+                    });
+                  },
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 4)),
               if (grouped.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
@@ -39,11 +76,9 @@ class MyUtilitiesScreen extends StatelessWidget {
                   itemBuilder: (context, i) {
                     final entry = grouped.entries.elementAt(i);
                     return FadeSlideIn(
-                      delay:
-                          Duration(milliseconds: 120 + i * 80),
+                      delay: Duration(milliseconds: 120 + i * 80),
                       child: _CategorySection(
-                        category:
-                            UtilityCategory.fromKey(entry.key),
+                        category: UtilityCategory.fromKey(entry.key),
                         bills: entry.value,
                       ),
                     );
@@ -334,6 +369,73 @@ class _EmptyState extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _StatusFilterChips extends StatelessWidget {
+  const _StatusFilterChips({
+    required this.selectedFilter,
+    required this.onSelect,
+    required this.allCount,
+    required this.dueCount,
+    required this.paidCount,
+  });
+
+  final String selectedFilter;
+  final ValueChanged<String> onSelect;
+  final int allCount;
+  final int dueCount;
+  final int paidCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final filters = [
+      {'key': 'All', 'label': 'All ($allCount)'},
+      {'key': 'Due', 'label': 'Due ($dueCount)'},
+      {'key': 'Paid', 'label': 'Paid ($paidCount)'},
+    ];
+
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: filters.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 40),
+        itemBuilder: (context, index) {
+          final filter = filters[index];
+          final key = filter['key']!;
+          final label = filter['label']!;
+          final isSelected = key.toLowerCase() == selectedFilter.toLowerCase();
+
+          return InkWell(
+            borderRadius: BorderRadius.circular(100),
+            onTap: () => onSelect(key),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : const Color(0xFFEFF3FA),
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : const Color(0xFFE2E8F0),
+                  width: 1,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: isSelected ? Colors.white : AppColors.textMuted,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
