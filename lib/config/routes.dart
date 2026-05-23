@@ -12,6 +12,7 @@ import 'package:my_cure_ui/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:my_cure_ui/features/dashboard/screens/utility_details_screen.dart';
 import 'package:my_cure_ui/features/dashboard/screens/pay_all_at_once_screen.dart';
 import 'package:my_cure_ui/features/shell/main_shell.dart';
+import 'package:my_cure_ui/features/dashboard/screens/quick_pay_screen.dart';
 import 'package:my_cure_ui/features/utilities/screens/my_utilities_screen.dart';
 import 'package:my_cure_ui/features/utilities/screens/register_utility_screen.dart';
 import 'package:my_cure_ui/features/payment/screens/payment_gateway_screen.dart';
@@ -32,6 +33,7 @@ class AppRoutes {
   static const String payAllAtOnce = '/pay-all-at-once';
   static const String myUtilities = '/my-utilities';
   static const String registerUtility = '/register-utility';
+  static const String quickPay = '/quick-pay';
   static const String paymentGateway = '/payment-gateway';
   static const String paymentSuccess = '/payment-success';
   static const String paymentHistory = '/payment-history';
@@ -134,6 +136,16 @@ class AppRoutes {
           builder: (_) => BlocProvider.value(
             value: bloc,
             child: const RegisterUtilityScreen(),
+          ),
+          settings: settings,
+        );
+
+      case quickPay:
+        final bloc = settings.arguments as DashboardBloc;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: bloc,
+            child: const QuickPayScreen(),
           ),
           settings: settings,
         );
